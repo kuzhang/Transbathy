@@ -1,0 +1,13 @@
+pip3 install torch torchvision torchaudio #cpu version
+pip install geopandas
+pip install openpyxl
+pip install pandas
+pip install matplotlib
+pip install numpy
+pip install rasterio
+pip install PyYAML
+pip install tqdm
+pip install scipy
+
+# data smoothing
+pip install opencv-python
