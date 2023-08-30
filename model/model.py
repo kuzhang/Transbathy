@@ -77,10 +77,11 @@ class BaseModel():
 
             self.optimizer.zero_grad()
             out = self.net(data['image'])
-            err = torch.sqrt(self.l_mse(out, data['depth']))
+            err = self.l_mse(out, data['depth'])
             err.backward()
             self.optimizer.step()
 
+            err = torch.sqrt(err)
             step_loss.append(err.item())
 
         time_o = time.time()
@@ -108,7 +109,8 @@ class BaseModel():
         else:
             df.to_csv(results_file, mode='a', header=False, index=False)
 
-        print(">> Training model {}. Epoch {}/{}" .format(self.name, self.epoch + 1, self.config['Train']['num_epoch']))
+        print(">> Training model {}. Epoch {}/{} training rmse: {} \n" .
+              format(self.name, self.epoch + 1, self.config['Train']['num_epoch'], rmse.item()))
 
     ##
     def train(self):
@@ -162,7 +164,7 @@ class BaseModel():
             # Measure inference time.
             infer_time = time_o - time_i
 
-            print('Testing time: {}, and the rmse: {}' .format(infer_time, rmse.item()))
+            print('Testing time: {:.2f} s, and the rmse: {}' .format(infer_time, rmse.item()))
 
             results = {
                 'epoch': self.epoch,
