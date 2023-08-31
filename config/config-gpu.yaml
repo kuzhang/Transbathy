@@ -17,13 +17,13 @@ Data:
   elev_threshold: -1
   split:
     - 0.7 # train split
-    - 0.2 # test split
+    - 0.3 # test split
   zscore_std: 2
 
 Train:
    resume: False
    start_epoch: 0
-   num_epoch: 100
+   num_epoch: 20
    print_freq: 1000
    save_file: "train.csv"
 

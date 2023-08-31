@@ -23,7 +23,7 @@ Data:
 Train:
    resume: False
    start_epoch: 0
-   num_epoch: 100
+   num_epoch: 20
    print_freq: 1000
    save_file: "train.csv"
 
