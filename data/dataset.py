@@ -96,7 +96,6 @@ class BathyDataset(Dataset):
             # Open the geotiff image file using Rasterio
             raster_path = os.path.join(data_path, raster_file_name)
             raster_img = rio.open(raster_path)
-
             shp_mod['ID'] = idx
             shps.append(shp_mod)
 

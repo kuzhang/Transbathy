@@ -5,7 +5,7 @@ Device: 'gpu'
 Metric: 'rmse'
 
 Data:
-  data_root: '/home/kunet.ae/ku500817/dataset/insitu/clip'
+  data_root: '/home/kunet.ae/ku500817/dataset/Khalifa-sentinel/train'
   dataset:
     - 'sirbaniyas_clip'
     - 'dalma_clip'

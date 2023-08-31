@@ -1,23 +1,23 @@
 # This config is for CPU training
 Phase: 'train' #'train' or 'test'
 Seed: 1
-Device: 'cpu'
+Device: 'gpu'
 Metric: 'rmse'
 
 Data:
   data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/Khalifa-sentinel'
   dataset:
-    - 'train/202107'
-    - 'train/202109'
-    - 'train/202111'
-    - 'train/202112'
+    - '202107'
+    - '202109'
+    - '202111'
+    - '202112'
   span: 1 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 1
   workers: 0
   elev_threshold: -1
   split:
-    - 0.01 # train split
-    - 0.01 # test split
+    - 0.7 # train split
+    - 0.3 # test split
   zscore_std: 2
 
 Train:
