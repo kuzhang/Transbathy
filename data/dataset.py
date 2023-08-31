@@ -7,7 +7,8 @@ import random
 import rasterio as rio
 import pandas as pd
 from scipy import stats
-
+from glob import glob
+import fnmatch
 
 class BathyDataset(Dataset):
 
@@ -82,17 +83,18 @@ class BathyDataset(Dataset):
         lats_uniq_list = []
         raster_size_list = []
         for idx, dataset in enumerate(self.dataset):
-            shp_file_name = dataset + '.csv'
-            raster_file_name = dataset + '.tif'
+            data_path = os.path.join(self.dataset_root, dataset)
+            shp_file_name = fnmatch.filter(os.listdir(data_path), '*.csv')[0]
+            raster_file_name = fnmatch.filter(os.listdir(data_path), '*.tif')[0]
 
             # Open the shapefile containing some in-situ data
-            shp_path = os.path.join(self.dataset_root, dataset, shp_file_name)
+            shp_path = os.path.join(data_path, shp_file_name)
             shp = pd.read_csv(shp_path) # EPSG:4326-WGS 84
             shp_mod = self.remove_land_point(shp)
             shp_mod = self.remove_outlier(shp_mod)
 
             # Open the geotiff image file using Rasterio
-            raster_path = os.path.join(self.dataset_root, dataset, raster_file_name)
+            raster_path = os.path.join(data_path, raster_file_name)
             raster_img = rio.open(raster_path)
 
             shp_mod['ID'] = idx

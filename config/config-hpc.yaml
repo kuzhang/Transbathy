@@ -9,12 +9,6 @@ Data:
   dataset:
     - 'sirbaniyas_clip'
     - 'dalma_clip'
-  shp_file_name:
-    - 'sirbaniyas_clip.csv'
-    - 'dalma_clip.csv'
-  raster_file_name:
-    - 'sirbaniyas_clip.tif'
-    - 'dalma_clip.tif'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 10
   workers: 8
