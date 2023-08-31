@@ -5,10 +5,12 @@ Device: 'cpu'
 Metric: 'rmse'
 
 Data:
-  data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/From Fahim/insitu/clip'
+  data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/Khalifa-sentinel/train'
   dataset:
-    - 'sirbaniyas_clip'
-    - 'dalma_clip'
+    - '202107'
+    - '202109'
+    - '202111'
+    - '202112'
   span: 1 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 1
   workers: 0

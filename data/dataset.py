@@ -85,7 +85,7 @@ class BathyDataset(Dataset):
         for idx, dataset in enumerate(self.dataset):
             data_path = os.path.join(self.dataset_root, dataset)
             shp_file_name = fnmatch.filter(os.listdir(data_path), '*.csv')[0]
-            raster_file_name = fnmatch.filter(os.listdir(data_path), '*.tif')[0]
+            raster_file_name = fnmatch.filter(os.listdir(data_path), '*.tiff')[0]
 
             # Open the shapefile containing some in-situ data
             shp_path = os.path.join(data_path, shp_file_name)
