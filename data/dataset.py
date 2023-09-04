@@ -85,7 +85,10 @@ class BathyDataset(Dataset):
         for idx, dataset in enumerate(self.dataset):
             data_path = os.path.join(self.dataset_root, dataset)
             shp_file_name = fnmatch.filter(os.listdir(data_path), '*.csv')[0]
-            raster_file_name = fnmatch.filter(os.listdir(data_path), '*.tiff')[0]
+            raster_files = fnmatch.filter(os.listdir(data_path), '*.tif')
+            if len(raster_files) == 0:
+                raster_files = fnmatch.filter(os.listdir(data_path), '*.tiff')
+            raster_file_name = raster_files[0]
 
             # Open the shapefile containing some in-situ data
             shp_path = os.path.join(data_path, shp_file_name)
@@ -118,6 +121,8 @@ class BathyDataset(Dataset):
         """
         dataset = self.config['Data']['dataset'][idx]
         raster_file_name = dataset + '.tif'
+        if ~os.path.isfile(raster_file_name):
+            raster_file_name = dataset + '.tiff'
         raster_path = os.path.join(self.dataset_root, dataset, raster_file_name)
         raster_img = rio.open(raster_path)
         img_dn = raster_img.read()
@@ -132,7 +137,9 @@ class BathyDataset(Dataset):
         :return: dataframe
         """
         shp_dept = shp['Depth'].to_numpy()
-        remove_list = np.where(shp_dept >= self.config['Data']['elev_threshold'])[0].tolist()
+        if np.median(shp_dept > 0):
+            shp['Depth'] = shp['Depth'] * -1
+        remove_list = np.where(shp['Depth'] >= self.config['Data']['elev_threshold'])[0].tolist()
         shp = shp.drop(remove_list, axis='index')
 
         return shp
@@ -173,8 +180,8 @@ class BathyDataset(Dataset):
         raster_size={}
         cols, rows = np.meshgrid(np.arange(width), np.arange(height))
         xs, ys = rio.transform.xy(raster.transform, rows, cols)
-        raster_lons_uniq = np.unique(np.array(xs).flatten())
-        raster_lats_uniq = np.unique(np.array(ys).flatten())
+        raster_lats_uniq = np.unique(np.array(xs).flatten())
+        raster_lons_uniq = np.unique(np.array(ys).flatten())
         raster_size['width'] = width
         raster_size['height'] = height
 
