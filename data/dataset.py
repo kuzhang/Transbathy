@@ -9,6 +9,7 @@ import pandas as pd
 from scipy import stats
 from glob import glob
 import fnmatch
+import rioxarray
 
 class BathyDataset(Dataset):
 
@@ -98,13 +99,18 @@ class BathyDataset(Dataset):
 
             # Open the geotiff image file using Rasterio
             raster_path = os.path.join(data_path, raster_file_name)
-            raster_img = rio.open(raster_path)
+            raster_img = rioxarray.open_rasterio(raster_path)
             shp_mod['ID'] = idx
             shps.append(shp_mod)
 
-            raster_lons_uniq, raster_lats_uniq, raster_size = self.create_raster_cord(raster_img)
-            lons_uniq_list.append(raster_lons_uniq)
-            lats_uniq_list.append(raster_lats_uniq)
+            # change loading raster image using rioxarray to fix the dataloading bugs, 7/09/2023
+            #raster_lons_uniq, raster_lats_uniq, raster_size = self.create_raster_cord(raster_img)
+            raster_lats = raster_img.y.to_numpy()
+            raster_lons = raster_img.x.to_numpy()
+            raster_size = {'width': raster_img.shape[2],
+                           'height': raster_img.shape[1]}
+            lons_uniq_list.append(raster_lons)
+            lats_uniq_list.append(raster_lats)
             raster_size_list.append(raster_size)
 
         shp_concat = pd.concat(shps, axis=0, ignore_index=True)
@@ -120,10 +126,10 @@ class BathyDataset(Dataset):
         :return: img_dn(np.array)
         """
         dataset = self.config['Data']['dataset'][idx]
-        raster_file_name = dataset + '.tif'
-        if ~os.path.isfile(raster_file_name):
-            raster_file_name = dataset + '.tiff'
-        raster_path = os.path.join(self.dataset_root, dataset, raster_file_name)
+        raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
+        if not os.path.exists(raster_path):
+            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
+
         raster_img = rio.open(raster_path)
         img_dn = raster_img.read()
         img_dn = img_dn.reshape(raster_img.height, raster_img.width, -1)  # h,w, c
@@ -179,9 +185,11 @@ class BathyDataset(Dataset):
         height = raster.height
         raster_size={}
         cols, rows = np.meshgrid(np.arange(width), np.arange(height))
-        xs, ys = rio.transform.xy(raster.transform, rows, cols)
-        raster_lats_uniq = np.unique(np.array(xs).flatten())
-        raster_lons_uniq = np.unique(np.array(ys).flatten())
+        #cols = np.arange(width).tolist()
+        #rows = np.arange(height).tolist()
+        xs, ys = rio.transform.xy(raster.transform, rows=rows, cols=cols)
+        raster_lons_uniq = np.unique(np.array(xs).flatten())  #x-coordinates
+        raster_lats_uniq = np.unique(np.array(ys).flatten())  #y-coordinates
         raster_size['width'] = width
         raster_size['height'] = height
 
@@ -203,8 +211,8 @@ class BathyDataset(Dataset):
             j_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
             img_id = self.shp['ID'].iloc[idx]
 
-            if i_idx in range(self.span - 1, self.raster_size[img_id]['width'] - self.span + 1) and \
-                    j_idx in range(self.span - 1, self.raster_size[img_id]['height'] - self.span + 1):
+            if i_idx in range(self.span, self.raster_size[img_id]['width'] - self.span) and \
+                    j_idx in range(self.span, self.raster_size[img_id]['height'] - self.span):
                 sampling_done = True
             else:
                 continue

@@ -9,5 +9,15 @@ pip install PyYAML
 pip install tqdm
 pip install scipy
 
-# data smoothing
+
+pip install rioxarray
+
+##optional packages
+##GDAL
+# linux
+conda install -c conda-forge gdal
+# windows
+dowdload gdal python wheel
+
+## data smoothing
 pip install opencv-python
