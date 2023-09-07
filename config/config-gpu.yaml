@@ -5,10 +5,12 @@ Device: 'gpu'
 Metric: 'rmse'
 
 Data:
-  data_root: '/home/yellow/bathymetry/dataset/clip'
+  data_root: '/home/yellow/bathymetry/dataset/Khalifa-sentinel/train'
   dataset:
-    - 'dalma_clip'
-    - 'sirbaniyas_clip'
+    - '202107'
+    - '202109'
+    - '202111'
+    - '202112'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 10
   workers: 8
