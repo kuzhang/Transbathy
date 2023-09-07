@@ -1,8 +1,11 @@
 import rioxarray
 import rasterio as rio
 import numpy as np
+import random
+import pandas as pd
 
 # compare rioxarray loading and rasterio loading
+random.seed(0)
 def create_raster_cord(raster):
     """
     convert raster coordinates (dataframe) to numpy array and concatenate all the coordinate to an array
@@ -28,4 +31,18 @@ raster_lons = rds.x.to_numpy()
 raster_img = rio.open(r"C:\Users\ku500817\Desktop\bathymetry\dataset\From Fahim\insitu\clip\dalma_clip\dalma_clip.tif")
 raster_lons_uniq, raster_lats_uniq= create_raster_cord(raster_img)
 
+shp_path = r"C:\Users\ku500817\Desktop\bathymetry\dataset\From Fahim\insitu\clip\dalma_clip\dalma_clip.csv"
+shp = pd.read_csv(shp_path)  # EPSG
+idx = random.randint(0, len(shp) - 1)
+# i_idx = np.argmin(np.abs(raster_lats_uniq - shp['Latitude'].iloc[idx]))
+# j_idx = np.argmin(np.abs(raster_lons_uniq - shp['Longitude'].iloc[idx]))
+# print('pixel idex {}, {}'.format(i_idx, j_idx))
+i_idx = np.argmin(np.abs(raster_lats - shp['Latitude'].iloc[idx]))
+j_idx = np.argmin(np.abs(raster_lons - shp['Longitude'].iloc[idx]))
+print('pixel idex {}, {}'.format(i_idx, j_idx))
+
+print('shape latitude and longitude {},{} \n '.format(shp['Latitude'].iloc[idx], shp['Longitude'].iloc[idx]))
+print('raster image latitude and longitude {},{} \n '.format(raster_lats_uniq[i_idx], raster_lons_uniq[j_idx]))
+print('raster xarray latitude and longitude {},{} \n '.format(raster_lats[i_idx], raster_lons[j_idx]))
+print('pixel idex {}, {}'.format(i_idx, j_idx))
 print('done')
