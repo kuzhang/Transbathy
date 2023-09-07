@@ -171,7 +171,7 @@ class BathyDataset(Dataset):
         :return: ndarray
         """
         img = self.load_img(img_id)
-        img_clip = img[(i_idx - self.span): (i_idx + self.span + 1), (j_idx - self.span): (j_idx + self.span + 1), :]
+        img_clip = img[(j_idx - self.span): (j_idx + self.span + 1), (i_idx - self.span): (i_idx + self.span + 1), :]
         img_clip = img_clip.reshape(-1, 3)
 
         return img_clip
@@ -207,12 +207,12 @@ class BathyDataset(Dataset):
 
         while not sampling_done:
             idx = random.randint(0, len(self.shp)-1)
-            i_idx = np.argmin(np.abs(self.raster_lats_uniq - self.shp['Latitude'].iloc[idx]))
-            j_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
+            j_idx = np.argmin(np.abs(self.raster_lats_uniq - self.shp['Latitude'].iloc[idx]))
+            i_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
             img_id = self.shp['ID'].iloc[idx]
 
-            if i_idx in range(self.span, self.raster_size[img_id]['width'] - self.span) and \
-                    j_idx in range(self.span, self.raster_size[img_id]['height'] - self.span):
+            if i_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
+                    j_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
                 sampling_done = True
             else:
                 continue
