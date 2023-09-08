@@ -164,7 +164,7 @@ class BaseModel():
             # Measure inference time.
             infer_time = time_o - time_i
 
-            print('Testing time: {:.2f} s, and the rmse: {}' .format(infer_time, rmse.item()))
+            print('Testing time: {:.2f} s, and the rmse: {} \n' .format(infer_time, rmse.item()))
 
             results = {
                 'epoch': self.epoch,
