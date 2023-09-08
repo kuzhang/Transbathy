@@ -33,7 +33,7 @@ Test:
   load_weights: False
   weight_dir: "./output/train/weights/net.pth"
   save_test: True
-  save_file: "test_clipcsv"
+  save_file: "test_clip.csv"
 
 Model:
   tgt_len: 1

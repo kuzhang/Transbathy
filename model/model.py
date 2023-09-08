@@ -152,7 +152,7 @@ class BaseModel():
 
             validationStep_loss = []
             time_i = time.time()
-            for i, data in enumerate(tqdm(self.dataloader['test']), 0):
+            for data in tqdm(self.dataloader['test'], leave=False, total=len(self.dataloader['test'])):
                 prediction = self.net(data['image'])
                 error = torch.sqrt(torch.mean(torch.pow((prediction - data['depth']), 2), dim=0))
                 validationStep_loss.append(error.item())
