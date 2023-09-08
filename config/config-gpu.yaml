@@ -23,7 +23,7 @@ Train:
    start_epoch: 0
    num_epoch: 20
    print_freq: 1000
-   save_file: "train_khalifa.csv"
+   save_file: "train_clip.csv"
 
 Optimizer:
    lr: 0.001 # learning rate
@@ -33,7 +33,7 @@ Test:
   load_weights: False
   weight_dir: "./output/train/weights/net.pth"
   save_test: True
-  save_file: "test_kahlifa.csv"
+  save_file: "test_clipcsv"
 
 Model:
   tgt_len: 1
