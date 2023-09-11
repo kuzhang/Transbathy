@@ -41,12 +41,12 @@ class BathyDataset(Dataset):
         return len(self.shp)
 
     def __getitem__(self, index):
-        idx, i_idx, j_idx = self.random_sample_points()
+        idx, lon_idx, lat_idx = self.random_sample_points()
         img_id = self.shp['ID'].iloc[idx]
 
         depth = [self.shp['Depth'].iloc[idx]]
         depth = torch.tensor(depth, dtype=torch.float32)
-        img_clip = self.clip_image(img_id, i_idx, j_idx)
+        img_clip = self.clip_image(img_id, lon_idx, lat_idx)
         img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
 
         outputs = {
@@ -86,10 +86,9 @@ class BathyDataset(Dataset):
         for idx, dataset in enumerate(self.dataset):
             data_path = os.path.join(self.dataset_root, dataset)
             shp_file_name = fnmatch.filter(os.listdir(data_path), '*.csv')[0]
-            raster_files = fnmatch.filter(os.listdir(data_path), '*.tif')
-            if len(raster_files) == 0:
-                raster_files = fnmatch.filter(os.listdir(data_path), '*.tiff')
-            raster_file_name = raster_files[0]
+            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
+            if not os.path.exists(raster_path):
+                raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
 
             # Open the shapefile containing some in-situ data
             shp_path = os.path.join(data_path, shp_file_name)
@@ -98,7 +97,6 @@ class BathyDataset(Dataset):
             shp_mod = self.remove_outlier(shp_mod)
 
             # Open the geotiff image file using Rasterio
-            raster_path = os.path.join(data_path, raster_file_name)
             raster_img = rioxarray.open_rasterio(raster_path)
             shp_mod['ID'] = idx
             shps.append(shp_mod)
@@ -162,17 +160,22 @@ class BathyDataset(Dataset):
 
         return shp
 
-    def clip_image(self, img_id, i_idx, j_idx):
+    def clip_image(self, img_id, lon_idx, lat_idx):
         """
         clip the areas on the image corresponding to the selected point
         :param img_id: image index
-        :param i_idx: select point i coordinate in image
-        :param j_idx: select point j coordinate in image
+        :param lon_idx: select point lon coordinate in image
+        :param lat_idx: select point lat coordinate in image
         :return: ndarray
         """
-        img = self.load_img(img_id)
-        img_clip = img[(j_idx - self.span): (j_idx + self.span + 1), (i_idx - self.span): (i_idx + self.span + 1), :]
-        img_clip = img_clip.reshape(-1, 3)
+        dataset = self.config['Data']['dataset'][img_id]
+        raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
+        if not os.path.exists(raster_path):
+            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
+
+        raster_img = rioxarray.open_rasterio(raster_path)
+        img_clip = raster_img[:, (lat_idx - self.span): (lat_idx + self.span + 1), (lon_idx - self.span): (lon_idx + self.span + 1)].to_numpy()
+        img_clip = img_clip.reshape(3, -1).transpose()
 
         return img_clip
 
@@ -200,24 +203,23 @@ class BathyDataset(Dataset):
         random sample data points from shape file and find the matched points in image, avoid points on the edge
         :return:
         """
-        sampling_done = False
-        i_idx = None
-        j_idx = None
+        lat_idx = None
+        lon_idx = None
         idx = None
 
-        while not sampling_done:
+        while lon_idx is None or lat_idx is None:
             idx = random.randint(0, len(self.shp)-1)
-            j_idx = np.argmin(np.abs(self.raster_lats_uniq - self.shp['Latitude'].iloc[idx]))
-            i_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
+            lat_idx = np.argmin(np.abs(self.raster_lats_uniq - self.shp['Latitude'].iloc[idx]))
+            lon_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
             img_id = self.shp['ID'].iloc[idx]
 
-            if i_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
-                    j_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
-                sampling_done = True
+            if lon_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
+                    lat_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
+                break
             else:
                 continue
 
-        return idx, i_idx, j_idx
+        return idx, lon_idx, lat_idx
 
 
 

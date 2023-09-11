@@ -18,12 +18,15 @@ fig, ax = plt.subplots(figsize=(10, 5))
 rds[1,:,:].plot(ax = ax)
 ax.set_title("Lidar Digital Elevation Model (DEM) \n Boulder Flood 2013")
 ax.set_axis_off()
-plt.show()
+
 
 
 rds = rds.squeeze().drop("spatial_ref").drop("band")
 rds.name = "data"
-res = rds.to_dataframe().reset_index()
+res = rds[1,:,:].to_dataframe().reset_index()
+ax.plot(res.x,res.y,'r.')
+plt.show()
+
 # res.head(3)
 #
 # gr = res.groupby(res.band)
@@ -31,7 +34,7 @@ res = rds.to_dataframe().reset_index()
 
 fig, ax = plt.subplots(figsize=(10, 5))
 show(dataset.read(5), transform=dataset.transform, ax=ax)
-ax.plot(res.x,res.y,'ro', markersize=3)
+
 
 print('done')
 
