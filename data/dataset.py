@@ -77,7 +77,7 @@ class BathyDataset(Dataset):
     def load_raster_shp(self):
         """
         load raster cordinates and shape file
-        :return: lons_uniq(np.array), lats_uniq(np.array), raster_size_list(list) and shape(dataframe)
+        :return: lons_uniq(list), lats_uniq(list), raster_size_list(list) and shape(dataframe)
         """
         shps = []
         lons_uniq_list = []
@@ -112,27 +112,10 @@ class BathyDataset(Dataset):
             raster_size_list.append(raster_size)
 
         shp_concat = pd.concat(shps, axis=0, ignore_index=True)
-        lons_uniq_concat = np.concatenate(lons_uniq_list, axis=0)
-        lats_uniq_concat = np.concatenate(lats_uniq_list, axis=0)
+        #lons_uniq_concat = np.concatenate(lons_uniq_list, axis=0)
+        #lats_uniq_concat = np.concatenate(lats_uniq_list, axis=0)
 
-        return lons_uniq_concat, lats_uniq_concat, raster_size_list, shp_concat
-
-    def load_img(self, idx):
-        """
-        Load image with given index
-        :param idx:
-        :return: img_dn(np.array)
-        """
-        dataset = self.config['Data']['dataset'][idx]
-        raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
-        if not os.path.exists(raster_path):
-            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
-
-        raster_img = rio.open(raster_path)
-        img_dn = raster_img.read()
-        img_dn = img_dn.reshape(raster_img.height, raster_img.width, -1)  # h,w, c
-
-        return img_dn
+        return lons_uniq_list, lats_uniq_list, raster_size_list, shp_concat
 
     def remove_land_point(self, shp):
         """
@@ -209,9 +192,9 @@ class BathyDataset(Dataset):
 
         while lon_idx is None or lat_idx is None:
             idx = random.randint(0, len(self.shp)-1)
-            lat_idx = np.argmin(np.abs(self.raster_lats_uniq - self.shp['Latitude'].iloc[idx]))
-            lon_idx = np.argmin(np.abs(self.raster_lons_uniq - self.shp['Longitude'].iloc[idx]))
             img_id = self.shp['ID'].iloc[idx]
+            lat_idx = np.argmin(np.abs(self.raster_lats_uniq[img_id] - self.shp['Latitude'].iloc[idx]))
+            lon_idx = np.argmin(np.abs(self.raster_lons_uniq[img_id] - self.shp['Longitude'].iloc[idx]))
 
             if lon_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
                     lat_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):

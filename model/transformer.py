@@ -41,15 +41,13 @@ class Transformer(nn.Module):
             dim_feedforward=dim_feedforward,
             dropout=dropout,
         )
-        self.linear = linear(dim_model, dim_out)
-        self.pool = avgpool(kernel)
+        self.linear = linear(kernel, dim_out)
+        self.pool = avgpool(dim_model)
         self.channel = dim_model
 
     def forward(self, src: Tensor) -> Tensor:
         out = self.encoder(src)
-        width = out.shape[1]
-        out = torch.reshape(out, (-1, self.channel, width))
         out = self.pool(out)
         out = torch.squeeze(out, -1)
         out = self.linear(out)
-        return out.reshape(-1, 1)
+        return out
