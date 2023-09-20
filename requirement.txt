@@ -8,16 +8,22 @@ pip install rasterio
 pip install PyYAML
 pip install tqdm
 pip install scipy
-
-
 pip install rioxarray
 
-##optional packages
+###optional packages###
 ##GDAL
 # linux
 conda install -c conda-forge gdal
 # windows
-dowdload gdal python wheel
+# download gdal python wheel
 
 ## data smoothing
 pip install opencv-python
+
+
+## sentinellat package
+pip install sentinelsat
+git clone https://github.com/sentinelsat/sentinelsat.git
+cd sentinelsat
+pip install -e .[dev]
+pytest -v

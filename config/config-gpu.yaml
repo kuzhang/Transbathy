@@ -20,6 +20,7 @@ Data:
 
 Train:
    resume: False
+   pre_trained_weights: 'weights/net.pth'
    start_epoch: 0
    num_epoch: 20
    print_freq: 1000

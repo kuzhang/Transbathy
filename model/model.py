@@ -243,8 +243,6 @@ class TransBath(BaseModel):
             self.net.train()
             self.optimizer = optim.Adam(self.net.parameters(), lr=self.config['Optimizer']['lr'], betas=(self.config['Optimizer']['beta'], 0.999))
 
-
-
     def reinit_net(self):
         """
         Re-initialize the weights of net

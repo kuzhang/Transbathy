@@ -10,7 +10,7 @@ Data:
     - 'dalma_clip'
     - 'sirbaniyas_clip'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
-  batch_size: 1
+  batch_size: 2
   workers: 0
   elev_threshold: -1
   split:
@@ -20,6 +20,7 @@ Data:
 
 Train:
    resume: False
+   pre_trained_weights: 'weights/net.pth'
    start_epoch: 0
    num_epoch: 1
    print_freq: 1000

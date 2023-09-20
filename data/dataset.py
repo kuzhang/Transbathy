@@ -101,8 +101,6 @@ class BathyDataset(Dataset):
             shp_mod['ID'] = idx
             shps.append(shp_mod)
 
-            # change loading raster image using rioxarray to fix the dataloading bugs, 7/09/2023
-            #raster_lons_uniq, raster_lats_uniq, raster_size = self.create_raster_cord(raster_img)
             raster_lats = raster_img.y.to_numpy()
             raster_lons = raster_img.x.to_numpy()
             raster_size = {'width': raster_img.shape[2],
@@ -112,8 +110,6 @@ class BathyDataset(Dataset):
             raster_size_list.append(raster_size)
 
         shp_concat = pd.concat(shps, axis=0, ignore_index=True)
-        #lons_uniq_concat = np.concatenate(lons_uniq_list, axis=0)
-        #lats_uniq_concat = np.concatenate(lats_uniq_list, axis=0)
 
         return lons_uniq_list, lats_uniq_list, raster_size_list, shp_concat
 
@@ -161,25 +157,6 @@ class BathyDataset(Dataset):
         img_clip = img_clip.reshape(3, -1).transpose()
 
         return img_clip
-
-    def create_raster_cord(self, raster):
-        """
-        convert raster coordinates (dataframe) to numpy array and concatenate all the coordinate to an array
-        :return: raster_lons_uniq(np.array), raster_lats_uniq(np.array), raster_size(dict)
-        """
-        width = raster.width
-        height = raster.height
-        raster_size={}
-        cols, rows = np.meshgrid(np.arange(width), np.arange(height))
-        #cols = np.arange(width).tolist()
-        #rows = np.arange(height).tolist()
-        xs, ys = rio.transform.xy(raster.transform, rows=rows, cols=cols)
-        raster_lons_uniq = np.unique(np.array(xs).flatten())  #x-coordinates
-        raster_lats_uniq = np.unique(np.array(ys).flatten())  #y-coordinates
-        raster_size['width'] = width
-        raster_size['height'] = height
-
-        return raster_lons_uniq, raster_lats_uniq, raster_size
 
     def random_sample_points(self):
         """
