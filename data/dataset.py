@@ -4,10 +4,7 @@ import time
 from torch.utils.data import Dataset
 import numpy as np
 import random
-import rasterio as rio
 import pandas as pd
-from scipy import stats
-from glob import glob
 import fnmatch
 import rioxarray
 
@@ -43,6 +40,7 @@ class BathyDataset(Dataset):
     def __getitem__(self, index):
         idx, lon_idx, lat_idx = self.random_sample_points()
         img_id = self.shp['ID'].iloc[idx]
+        print('load shape file:{}'.format(self.shp['name'].iloc[idx]))
 
         depth = [self.shp['Depth'].iloc[idx]]
         depth = torch.tensor(depth, dtype=torch.float32)
@@ -85,21 +83,23 @@ class BathyDataset(Dataset):
         raster_size_list = []
         for idx, dataset in enumerate(self.dataset):
             data_path = os.path.join(self.dataset_root, dataset)
-            shp_file_name = fnmatch.filter(os.listdir(data_path), '*.csv')[0]
+
+            # Open the shapefile containing some in-situ data
+            shp_files = fnmatch.filter(os.listdir(data_path), '*.csv')
+            for shp_file_name in shp_files:
+                shp_path = os.path.join(data_path, shp_file_name)
+                shp = pd.read_csv(shp_path) # EPSG:4326-WGS 84
+                shp_mod = self.remove_land_point(shp)
+                shp_mod = self.remove_outlier(shp_mod)
+                shp_mod['ID'] = idx
+                shp_mod['name'] = shp_file_name
+                shps.append(shp_mod)
+
+            # Open the geotiff image file using Rasterio
             raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
             if not os.path.exists(raster_path):
                 raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
-
-            # Open the shapefile containing some in-situ data
-            shp_path = os.path.join(data_path, shp_file_name)
-            shp = pd.read_csv(shp_path) # EPSG:4326-WGS 84
-            shp_mod = self.remove_land_point(shp)
-            shp_mod = self.remove_outlier(shp_mod)
-
-            # Open the geotiff image file using Rasterio
             raster_img = rioxarray.open_rasterio(raster_path)
-            shp_mod['ID'] = idx
-            shps.append(shp_mod)
 
             raster_lats = raster_img.y.to_numpy()
             raster_lons = raster_img.x.to_numpy()
@@ -113,32 +113,6 @@ class BathyDataset(Dataset):
 
         return lons_uniq_list, lats_uniq_list, raster_size_list, shp_concat
 
-    def remove_land_point(self, shp):
-        """
-        remove the in situ data where is for land
-        :param shp: dataframe
-        :return: dataframe
-        """
-        shp_dept = shp['Depth'].to_numpy()
-        if np.median(shp_dept > 0):
-            shp['Depth'] = shp['Depth'] * -1
-        remove_list = np.where(shp['Depth'] >= self.config['Data']['elev_threshold'])[0].tolist()
-        shp = shp.drop(remove_list, axis='index')
-
-        return shp
-
-    def remove_outlier(self, shp):
-        """
-        remove the outlier in situ data
-        :param shp: dataframe
-        :return: dataframe
-        """
-        z_score = np.abs(stats.zscore(shp))
-        remove_list = np.where(z_score > self.config['Data']['zscore_std'])[0].tolist()
-        shp = shp.drop(shp.index[remove_list], axis='index')
-
-        return shp
-
     def clip_image(self, img_id, lon_idx, lat_idx):
         """
         clip the areas on the image corresponding to the selected point
@@ -151,6 +125,7 @@ class BathyDataset(Dataset):
         raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
         if not os.path.exists(raster_path):
             raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
+        print('load raster file:{}'.format(dataset))
 
         raster_img = rioxarray.open_rasterio(raster_path)
         img_clip = raster_img[:, (lat_idx - self.span): (lat_idx + self.span + 1), (lon_idx - self.span): (lon_idx + self.span + 1)].to_numpy()

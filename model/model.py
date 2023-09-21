@@ -73,6 +73,10 @@ class BaseModel():
         epoch_iter = 0
         time_i = time.time()
         for data in tqdm(self.dataloader['train'], leave=False, total=len(self.dataloader['train'])):
+            # skip the data is None:
+            if data is None:
+                continue
+
             epoch_iter += self.config['Data']['batch_size']
 
             self.optimizer.zero_grad()
@@ -153,6 +157,8 @@ class BaseModel():
             validationStep_loss = []
             time_i = time.time()
             for data in tqdm(self.dataloader['test'], leave=False, total=len(self.dataloader['test'])):
+                if data is None:
+                    continue
                 prediction = self.net(data['image'])
                 error = torch.sqrt(torch.mean(torch.pow((prediction - data['depth']), 2), dim=0))
                 validationStep_loss.append(error.item())
