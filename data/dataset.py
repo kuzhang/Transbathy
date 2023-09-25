@@ -35,13 +35,14 @@ class BathyDataset(Dataset):
         shp_dict['test'] = data_idx[train_len:train_len+test_len]
         shp_dict['val'] = data_idx[train_len+test_len:]
 
-        self.shp = shp_dict[split]
+        self.shp_idx = shp_dict[split]
 
 
     def __len__(self):
-        return len(self.shp)
+        return len(self.shp_idx)
 
-    def __getitem__(self, index):
+    def __getitem__(self, idx):
+        index = self.shp_idx(idx)
         shp_id = np.where((self.data_interval - index) >= 0)[0][0]
         img_id = self.data_ids[shp_id]
         if shp_id > 0:
@@ -113,7 +114,6 @@ class BathyDataset(Dataset):
                 data_interval.append(data_len - 1)
                 data_ids.append(idx)
 
-
         return np.array(data_interval), data_ids, shp_names, data_lons, data_lats
 
     def clip_image(self, img_id, lon_idx, lat_idx):
@@ -130,7 +130,6 @@ class BathyDataset(Dataset):
             raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
 
         raster_img = rioxarray.open_rasterio(raster_path)
-        #TODO: sample data and auto duplicate the data on margin
         width = raster_img.shape[2]
         height = raster_img.shape[1]
         tl_y = max(0, lat_idx - self.span)
