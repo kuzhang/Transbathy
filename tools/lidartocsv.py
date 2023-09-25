@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 import rioxarray as rxr
 import matplotlib.pyplot as plt
-
+from rasterio.enums import Resampling
 def plot_3dimg(x,y,z,idx):
     ax = plt.figure(idx).add_subplot(projection='3d')
     ax.scatter(x, y, z, marker='.')
     plt.show()
 
-root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\2019_NGS_FL_topobathy_Irma_Job912253"
+root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\caborojo"
 
 for path, dirs, files in os.walk(root, topdown= False):
     for name in files:
@@ -17,8 +17,16 @@ for path, dirs, files in os.walk(root, topdown= False):
             img_path = os.path.join(path, name)
 
             with rxr.open_rasterio(img_path) as rds:
+                scale_factor = 10
+                new_width = rds.rio.width // scale_factor
+                new_height = rds.rio.height // scale_factor
+                rds_downsampled = rds.rio.reproject(
+                    rds.rio.crs,
+                    shape=(new_height, new_width),
+                    resampling=Resampling.bilinear,
+                )
                 # reproject coordinate data from utm to lon and lats
-                rds = rds.rio.reproject("EPSG:4326")
+                rds = rds_downsampled.rio.reproject("EPSG:4326")
                 img = rds.to_numpy()
 
                 # replace nodata (-999999.) to np.nan

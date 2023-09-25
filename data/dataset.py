@@ -5,8 +5,10 @@ from torch.utils.data import Dataset
 import numpy as np
 import random
 import pandas as pd
-import fnmatch
+import json
 import rioxarray
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 class BathyDataset(Dataset):
 
@@ -21,15 +23,17 @@ class BathyDataset(Dataset):
         self.dataset_root = self.config['Data']['data_root']
         self.dataset = self.config['Data']['dataset']
         self.span = self.config['Data']['span']
-        self.raster_lons_uniq, self.raster_lats_uniq, self.raster_size, shp = self.load_raster_shp()
+        self.data_interval, self.data_ids, self.shp_names, self.data_lons, self.data_lats = self.load_raster_shp()
 
         # random shuffle shape file
-        shp_shuffle = shp.sample(frac=1)
-        train_len, test_len = [int(i * shp.shape[0]) for i in self.config['Data']['split']]
+        total_len = self.data_interval[-1] + 1
+        train_len, test_len = [int(i * total_len) for i in self.config['Data']['split']]
+        data_idx = np.arange(total_len)
+        np.random.shuffle(data_idx)
         shp_dict = {}
-        shp_dict['train'] = shp_shuffle.iloc[:train_len,:]
-        shp_dict['test'] = shp_shuffle.iloc[train_len:train_len+test_len,:]
-        shp_dict['val'] = shp_shuffle.iloc[train_len+test_len:, :]
+        shp_dict['train'] = data_idx[:train_len]
+        shp_dict['test'] = data_idx[train_len:train_len+test_len]
+        shp_dict['val'] = data_idx[train_len+test_len:]
 
         self.shp = shp_dict[split]
 
@@ -38,12 +42,25 @@ class BathyDataset(Dataset):
         return len(self.shp)
 
     def __getitem__(self, index):
-        idx, lon_idx, lat_idx = self.random_sample_points()
-        img_id = self.shp['ID'].iloc[idx]
-        print('load shape file:{}'.format(self.shp['name'].iloc[idx]))
+        shp_id = np.where((self.data_interval - index) >= 0)[0][0]
+        img_id = self.data_ids[shp_id]
+        if shp_id > 0:
+            index_rec = index - self.data_interval[shp_id - 1]
+        else:
+            index_rec = index
+        shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
+        shp = pd.read_csv(shp_path)
+        depth = shp['Depth'].iloc[index_rec]
+        depth = torch.tensor([depth], dtype=torch.float32)
 
-        depth = [self.shp['Depth'].iloc[idx]]
-        depth = torch.tensor(depth, dtype=torch.float32)
+        lons = np.array(self.data_lons[img_id])
+        lats = np.array(self.data_lats[img_id])
+        lon_idx = np.argmin(np.abs(lons - shp['Longitude'].iloc[index_rec]))
+        lat_idx = np.argmin(np.abs(lats - shp['Latitude'].iloc[index_rec]))
+
+        # if lon_idx in np.arange(self.span, len(shp['Longitude']) - self.span, 1) and \
+        #         lat_idx in np.arange(self.span, len(shp['Latitude']) - self.span, 1):
+
         img_clip = self.clip_image(img_id, lon_idx, lat_idx)
         img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
 
@@ -77,41 +94,27 @@ class BathyDataset(Dataset):
         load raster cordinates and shape file
         :return: lons_uniq(list), lats_uniq(list), raster_size_list(list) and shape(dataframe)
         """
-        shps = []
-        lons_uniq_list = []
-        lats_uniq_list = []
-        raster_size_list = []
+        data_len = 0
+        data_interval = []
+        data_ids = []
+        shp_names = []
+        data_lons = []
+        data_lats = []
         for idx, dataset in enumerate(self.dataset):
-            data_path = os.path.join(self.dataset_root, dataset)
+            data_spec_path = os.path.join(base_dir, '../dataset_spec', dataset +'.txt')
+            with open(data_spec_path, "r") as fp:
+                dataset_spec = json.load(fp)
+            shp_lens = dataset_spec['shp_infos']
+            shp_names.extend(dataset_spec['shp_names'])
+            data_lons.append(dataset_spec['lons'])
+            data_lats.append(dataset_spec['lats'])
+            for l in shp_lens:
+                data_len += l
+                data_interval.append(data_len - 1)
+                data_ids.append(idx)
 
-            # Open the shapefile containing some in-situ data
-            shp_files = fnmatch.filter(os.listdir(data_path), '*.csv')
-            for shp_file_name in shp_files:
-                shp_path = os.path.join(data_path, shp_file_name)
-                shp = pd.read_csv(shp_path) # EPSG:4326-WGS 84
-                shp_mod = self.remove_land_point(shp)
-                shp_mod = self.remove_outlier(shp_mod)
-                shp_mod['ID'] = idx
-                shp_mod['name'] = shp_file_name
-                shps.append(shp_mod)
 
-            # Open the geotiff image file using Rasterio
-            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
-            if not os.path.exists(raster_path):
-                raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
-            raster_img = rioxarray.open_rasterio(raster_path)
-
-            raster_lats = raster_img.y.to_numpy()
-            raster_lons = raster_img.x.to_numpy()
-            raster_size = {'width': raster_img.shape[2],
-                           'height': raster_img.shape[1]}
-            lons_uniq_list.append(raster_lons)
-            lats_uniq_list.append(raster_lats)
-            raster_size_list.append(raster_size)
-
-        shp_concat = pd.concat(shps, axis=0, ignore_index=True)
-
-        return lons_uniq_list, lats_uniq_list, raster_size_list, shp_concat
+        return np.array(data_interval), data_ids, shp_names, data_lons, data_lats
 
     def clip_image(self, img_id, lon_idx, lat_idx):
         """
@@ -125,36 +128,42 @@ class BathyDataset(Dataset):
         raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
         if not os.path.exists(raster_path):
             raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
-        print('load raster file:{}'.format(dataset))
 
         raster_img = rioxarray.open_rasterio(raster_path)
-        img_clip = raster_img[:, (lat_idx - self.span): (lat_idx + self.span + 1), (lon_idx - self.span): (lon_idx + self.span + 1)].to_numpy()
-        img_clip = img_clip.reshape(3, -1).transpose()
+        #TODO: sample data and auto duplicate the data on margin
+        width = raster_img.shape[2]
+        height = raster_img.shape[1]
+        tl_y = max(0, lat_idx - self.span)
+        tl_x = max(0, lon_idx - self.span)
+        br_y = min(height, lat_idx + self.span + 1)
+        br_x = min(width, lon_idx + self.span + 1)
+        img_clip = raster_img[:, tl_y: br_y, tl_x: br_x].to_numpy()
 
-        return img_clip
+        pad_rows = (max(self.span - lat_idx, 0), max(lat_idx + self.span + 1 - height, 0))
+        pad_cols = (max(self.span - lon_idx, 0), max(lon_idx + self.span + 1 - width, 0))
+        pad_dims = (0,0)
 
-    def random_sample_points(self):
-        """
-        random sample data points from shape file and find the matched points in image, avoid points on the edge
-        :return:
-        """
-        lat_idx = None
-        lon_idx = None
-        idx = None
+        img_clip_pad = np.pad(img_clip, (pad_dims, pad_rows, pad_cols), 'edge')
 
-        while lon_idx is None or lat_idx is None:
-            idx = random.randint(0, len(self.shp)-1)
-            img_id = self.shp['ID'].iloc[idx]
-            lat_idx = np.argmin(np.abs(self.raster_lats_uniq[img_id] - self.shp['Latitude'].iloc[idx]))
-            lon_idx = np.argmin(np.abs(self.raster_lons_uniq[img_id] - self.shp['Longitude'].iloc[idx]))
+        img_clip_pad = img_clip_pad.reshape(3, -1).transpose()
 
-            if lon_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
-                    lat_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
-                break
-            else:
-                continue
+        return img_clip_pad
 
-        return idx, lon_idx, lat_idx
+    # def sample_points(self,img_id):
+    #     """
+    #     random sample data points from shape file and find the matched points in image, avoid points on the edge
+    #     :return:
+    #     """
+    #     lat_idx = np.argmin(np.abs(self.raster_lats_uniq[img_id] - self.shp['Latitude'].iloc[idx]))
+    #     lon_idx = np.argmin(np.abs(self.raster_lons_uniq[img_id] - self.shp['Longitude'].iloc[idx]))
+    #
+    #     if lon_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
+    #             lat_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
+    #         break
+    #     else:
+    #         continue
+    #
+    #     return idx, lon_idx, lat_idx
 
 
 
@@ -164,6 +173,6 @@ if __name__ == '__main__':
         config = yaml.safe_load(file)
 
     data = BathyDataset(config)
-    sample = data.__getitem__(0)
+    sample = data.__getitem__(21111111)
 
     print('data loaded')

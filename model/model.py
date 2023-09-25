@@ -74,9 +74,6 @@ class BaseModel():
         time_i = time.time()
         for data in tqdm(self.dataloader['train'], leave=False, total=len(self.dataloader['train'])):
             # skip the data is None:
-            if data is None:
-                continue
-
             epoch_iter += self.config['Data']['batch_size']
 
             self.optimizer.zero_grad()

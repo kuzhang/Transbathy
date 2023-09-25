@@ -6,6 +6,8 @@ import os
 import rioxarray as rxr
 import json
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Loading configurations in yaml file
 with open('../config/config-cpu.yaml', 'r') as file:
     config = yaml.safe_load(file)
@@ -87,7 +89,7 @@ for idx, dataset in enumerate(dataset):
                     'ID': idx
                     }
 
-    dataspec_path = '../dataset_spec/' + dataset + '.txt'
+    dataspec_path = os.path.join(base_dir,'../dataset_spec', dataset + '.txt')
 
     with open(dataspec_path, "w") as fp:
         json.dump(dataset_info, fp)
