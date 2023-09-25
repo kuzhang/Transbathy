@@ -5,28 +5,29 @@ Device: 'gpu'
 Metric: 'rmse'
 
 Data:
-  data_root: '/home/kunet.ae/ku500817/dataset/Khalifa-sentinel/train'
+  data_root: '/home/kunet.ae/ku500817/dataset/PR_lidar'
   dataset:
-    - '202107'
-    - '202109'
-    - '202111'
-    - '202112'
+    - 'caborojo'
+    - 'honolulu'
+    - 'keywest'
+    - 'makua'
+    - 'poleojea'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
-  batch_size: 10
+  batch_size: 32
   workers: 8
   elev_threshold: -1
   split:
     - 0.7 # train split
-    - 0.3 # test split
+    - 0.2 # test split
   zscore_std: 2
 
 Train:
    resume: False
    pre_trained_weights: 'weights/net.pth'
    start_epoch: 0
-   num_epoch: 20
+   num_epoch: 50
    print_freq: 1000
-   save_file: "train.csv"
+   save_file: "train_lidar.csv"
 
 Optimizer:
    lr: 0.001 # learning rate
@@ -36,7 +37,7 @@ Test:
   load_weights: False
   weight_dir: "./output/train/weights/net.pth"
   save_test: True
-  save_file: "test.csv"
+  save_file: "test_lidar.csv"
 
 Model:
   tgt_len: 1
