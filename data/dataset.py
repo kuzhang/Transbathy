@@ -23,7 +23,7 @@ class BathyDataset(Dataset):
         self.dataset_root = self.config['Data']['data_root']
         self.dataset = self.config['Data']['dataset']
         self.span = self.config['Data']['span']
-        self.data_interval, self.data_ids, self.shp_names, self.data_lons, self.data_lats = self.load_raster_shp()
+        self.data_interval, self.data_ids, self.shp_names, self.data_lons, self.data_lats, data_infos = self.load_raster_shp()
 
         # random shuffle shape file
         total_len = self.data_interval[-1] + 1
@@ -101,6 +101,7 @@ class BathyDataset(Dataset):
         shp_names = []
         data_lons = []
         data_lats = []
+        data_infos = []
         for idx, dataset in enumerate(self.dataset):
             data_spec_path = os.path.join(base_dir, '../dataset_spec', dataset +'.txt')
             with open(data_spec_path, "r") as fp:
@@ -109,12 +110,13 @@ class BathyDataset(Dataset):
             shp_names.extend(dataset_spec['shp_names'])
             data_lons.append(dataset_spec['lons'])
             data_lats.append(dataset_spec['lats'])
+            data_infos.append(dataset_spec)
             for l in shp_lens:
                 data_len += l
                 data_interval.append(data_len - 1)
                 data_ids.append(idx)
 
-        return np.array(data_interval), data_ids, shp_names, data_lons, data_lats
+        return np.array(data_interval), data_ids, shp_names, data_lons, data_lats, data_infos
 
     def clip_image(self, img_id, lon_idx, lat_idx):
         """
