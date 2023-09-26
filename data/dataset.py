@@ -60,9 +60,6 @@ class BathyDataset(Dataset):
         lon_idx = np.argmin(np.abs(lons - shp['Longitude'].iloc[index_rec]))
         lat_idx = np.argmin(np.abs(lats - shp['Latitude'].iloc[index_rec]))
 
-        # if lon_idx in np.arange(self.span, len(shp['Longitude']) - self.span, 1) and \
-        #         lat_idx in np.arange(self.span, len(shp['Latitude']) - self.span, 1):
-
         img_clip = self.clip_image(img_id, lon_idx, lat_idx)
         img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
 
@@ -151,22 +148,6 @@ class BathyDataset(Dataset):
         img_clip_pad = img_clip_pad.reshape(3, -1).transpose()
 
         return img_clip_pad
-
-    # def sample_points(self,img_id):
-    #     """
-    #     random sample data points from shape file and find the matched points in image, avoid points on the edge
-    #     :return:
-    #     """
-    #     lat_idx = np.argmin(np.abs(self.raster_lats_uniq[img_id] - self.shp['Latitude'].iloc[idx]))
-    #     lon_idx = np.argmin(np.abs(self.raster_lons_uniq[img_id] - self.shp['Longitude'].iloc[idx]))
-    #
-    #     if lon_idx in np.arange(self.span, self.raster_size[img_id]['width'] - self.span, 1) and \
-    #             lat_idx in np.arange(self.span, self.raster_size[img_id]['height'] - self.span, 1):
-    #         break
-    #     else:
-    #         continue
-    #
-    #     return idx, lon_idx, lat_idx
 
 
 
