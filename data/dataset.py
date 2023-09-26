@@ -75,7 +75,7 @@ class BathyDataset(Dataset):
             return outputs
 
         except:
-            print()
+            print('shp id:{}, index:{}/{}'.format(shp_id, index_rec, index))
 
 
     def seed(self, seed_value):
