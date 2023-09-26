@@ -46,13 +46,12 @@ class BathyDataset(Dataset):
         shp_id = np.where((self.data_interval - index) >= 0)[0][0]
         img_id = self.data_ids[shp_id]
         if shp_id > 0:
-            index_rec = index - self.data_interval[shp_id - 1]
+            index_rec = index - self.data_interval[shp_id - 1] - 1
         else:
             index_rec = index
 
         shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
         shp = pd.read_csv(shp_path)
-        print('shp id:{}, index:{}/{}'.format(shp_id, index_rec, index))
         depth = shp['Depth'].iloc[index_rec]
         depth = torch.tensor([depth], dtype=torch.float32)
 
