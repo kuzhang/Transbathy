@@ -42,7 +42,7 @@ class BathyDataset(Dataset):
         return len(self.shp_idx)
 
     def __getitem__(self, idx):
-        index = self.shp_idx(idx)
+        index = self.shp_idx[idx]
         shp_id = np.where((self.data_interval - index) >= 0)[0][0]
         img_id = self.data_ids[shp_id]
         if shp_id > 0:
