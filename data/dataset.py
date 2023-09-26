@@ -49,28 +49,33 @@ class BathyDataset(Dataset):
             index_rec = index - self.data_interval[shp_id - 1]
         else:
             index_rec = index
-        shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
-        shp = pd.read_csv(shp_path)
-        depth = shp['Depth'].iloc[index_rec]
-        depth = torch.tensor([depth], dtype=torch.float32)
 
-        lons = np.array(self.data_lons[img_id])
-        lats = np.array(self.data_lats[img_id])
-        lon_idx = np.argmin(np.abs(lons - shp['Longitude'].iloc[index_rec]))
-        lat_idx = np.argmin(np.abs(lats - shp['Latitude'].iloc[index_rec]))
+        try:
+            shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
+            shp = pd.read_csv(shp_path)
+            depth = shp['Depth'].iloc[index_rec]
+            depth = torch.tensor([depth], dtype=torch.float32)
 
-        # if lon_idx in np.arange(self.span, len(shp['Longitude']) - self.span, 1) and \
-        #         lat_idx in np.arange(self.span, len(shp['Latitude']) - self.span, 1):
+            lons = np.array(self.data_lons[img_id])
+            lats = np.array(self.data_lats[img_id])
+            lon_idx = np.argmin(np.abs(lons - shp['Longitude'].iloc[index_rec]))
+            lat_idx = np.argmin(np.abs(lats - shp['Latitude'].iloc[index_rec]))
 
-        img_clip = self.clip_image(img_id, lon_idx, lat_idx)
-        img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
+            # if lon_idx in np.arange(self.span, len(shp['Longitude']) - self.span, 1) and \
+            #         lat_idx in np.arange(self.span, len(shp['Latitude']) - self.span, 1):
 
-        outputs = {
-            'image': img_clip_norm,
-            'depth': depth
-        }
+            img_clip = self.clip_image(img_id, lon_idx, lat_idx)
+            img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
 
-        return outputs
+            outputs = {
+                'image': img_clip_norm,
+                'depth': depth
+            }
+
+            return outputs
+
+        except:
+            print()
 
 
     def seed(self, seed_value):
