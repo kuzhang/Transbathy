@@ -43,8 +43,8 @@ def remove_outlier(shp):
 
 
 dataset_root = config['Data']['data_root']
-dataset = config['Data']['dataset']
-for idx, dataset in enumerate(dataset):
+datasets = config['Data']['dataset']
+for idx, dataset in enumerate(datasets):
     data_path = os.path.join(dataset_root, dataset)
     # Open the shapefile containing some in-situ data
     shp_infos = []
