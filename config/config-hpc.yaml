@@ -11,12 +11,12 @@ Data:
     - 'dalma_clip'
     - 'sirbaniyas_clip'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
-  batch_size: 32
-  workers: 8
+  batch_size: 4
+  workers: 1
   elev_threshold: -1
   split:
-    - 0.7 # train split
-    - 0.2 # test split
+    - 0.1 # train split
+    - 0.1 # test split
   zscore_std: 2
 
 Train:
