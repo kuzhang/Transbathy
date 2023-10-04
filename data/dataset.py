@@ -65,7 +65,9 @@ class BathyDataset(Dataset):
 
         outputs = {
             'image': img_clip_norm,
-            'depth': depth
+            'depth': depth,
+            'lon': shp['Longitude'].iloc[index_rec],
+            'lat': shp['Latitude'].iloc[index_rec]
         }
 
         return outputs

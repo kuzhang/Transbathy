@@ -35,6 +35,8 @@ Test:
   weight_dir: "./output/train/weights/net.pth"
   save_test: True
   save_file: "test.csv"
+  visualize: True
+  visual_save_file: "test_visualize_output.csv"
 
 Model:
   tgt_len: 1

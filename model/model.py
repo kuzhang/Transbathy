@@ -152,13 +152,18 @@ class BaseModel():
                 print('   Loaded weights.')
 
             predictions = []
-            ground_truths = []
+            observations = []
+            lons = []
+            lats = []
             validationStep_loss = []
             time_i = time.time()
             for data in tqdm(self.dataloader['test'], leave=False, total=len(self.dataloader['test'])):
                 prediction = self.net(data['image'])
                 predictions.append(prediction)
-                ground_truths.append(data['depth'])
+                if self.config['Test']['visualize']:
+                    observations.append(data['depth'])
+                    lons.append(data['lon'])
+                    lats.append(data['lat'])
                 error = torch.sqrt(torch.mean(torch.pow((prediction - data['depth']), 2), dim=0))
                 validationStep_loss.append(error.item())
 
@@ -193,6 +198,19 @@ class BaseModel():
                     df.to_csv(results_file, index=False, header=True)
                 else:
                     df.to_csv(results_file, mode='a', header=False, index=False)
+
+            if self.config['Test']['visualize']:
+                visual_data ={
+                    'lons': lons,
+                    'lats': lats,
+                    'predictions': predictions,
+                    'observation': observations
+                }
+
+                df = pd.DataFrame(visual_data)
+                visual_save_file = self.config['Test']['visual_save_file']
+                visual_file = os.path.join(dst, visual_save_file)
+                df.to_csv(visual_file, index=False, header=True)
 
             return results
 
