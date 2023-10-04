@@ -15,8 +15,8 @@ Data:
   workers: 1
   elev_threshold: -1
   split:
-    - 0.1 # train split
-    - 0.1 # test split
+    - 0.7 # train split
+    - 0.3 # test split
   zscore_std: 2
 
 Train:

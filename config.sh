@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --job-name=transbathy
-#SBATCH --time=12:00:00
+#SBATCH --time=48:00:00
 #SBATCH --partition=gpu
 #SBATCH --account=kuin0084
 #SBATCH --output=transbathy.%j.out

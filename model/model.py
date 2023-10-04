@@ -151,12 +151,14 @@ class BaseModel():
                     raise IOError("net weights not found")
                 print('   Loaded weights.')
 
+            predictions = []
+            ground_truths = []
             validationStep_loss = []
             time_i = time.time()
             for data in tqdm(self.dataloader['test'], leave=False, total=len(self.dataloader['test'])):
-                if data is None:
-                    continue
                 prediction = self.net(data['image'])
+                predictions.append(prediction)
+                ground_truths.append(data['depth'])
                 error = torch.sqrt(torch.mean(torch.pow((prediction - data['depth']), 2), dim=0))
                 validationStep_loss.append(error.item())
 
