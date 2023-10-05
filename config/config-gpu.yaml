@@ -15,8 +15,8 @@ Data:
     - 'dalma_clip'
     - 'sirbaniyas_clip'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
-  batch_size: 32
-  workers: 8
+  batch_size: 16
+  workers: 4
   elev_threshold: -1
   split:
     - 0.7 # train split
@@ -40,7 +40,7 @@ Test:
   weight_dir: "./output/train/weights/net.pth"
   save_test: True
   save_file: "test_lidarnclip.csv"
-  visualize: True
+  visualize: False
   visual_save_file: "test_visualize_output.csv"
 
 Model:

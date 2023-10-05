@@ -149,6 +149,8 @@ class BathyDataset(Dataset):
 
         img_clip_pad = img_clip_pad.reshape(3, -1).transpose()
 
+        raster_img.close()
+
         return img_clip_pad
 
 
