@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes=1
+#SBATCH --tasks=4
 #SBATCH --gres=gpu:2
 #SBATCH --job-name=transbathy
 #SBATCH --time=48:00:00
