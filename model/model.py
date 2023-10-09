@@ -73,17 +73,18 @@ class BaseModel():
         epoch_iter = 0
         time_i = time.time()
         for data in tqdm(self.dataloader['train'], leave=False, total=len(self.dataloader['train'])):
-            # skip the data is None:
+            img = data['image'].to(self.device)
+            tgt = data['depth'].to(self.device)
             epoch_iter += self.config['Data']['batch_size']
 
             self.optimizer.zero_grad()
-            out = self.net(data['image'])
-            err = self.l_mse(out, data['depth'])
+            out = self.net(img)
+            err = self.l_mse(out, tgt)
             err.backward()
             self.optimizer.step()
 
-            err = torch.sqrt(err)
-            step_loss.append(err.item())
+            rmse_err = torch.sqrt(err)
+            step_loss.append(rmse_err.item())
 
         time_o = time.time()
         rmse = np.array(step_loss).mean()
@@ -158,13 +159,15 @@ class BaseModel():
             validationStep_loss = []
             time_i = time.time()
             for data in tqdm(self.dataloader['test'], leave=False, total=len(self.dataloader['test'])):
-                prediction = self.net(data['image'])
+                img = data['image'].to(self.device)
+                tgt = data['depth'].to(self.device)
+                prediction = self.net(img)
                 predictions.append(prediction)
                 if self.config['Test']['visualize']:
                     observations.append(data['depth'])
                     lons.append(data['lon'])
                     lats.append(data['lat'])
-                error = torch.sqrt(torch.mean(torch.pow((prediction - data['depth']), 2), dim=0))
+                error = torch.sqrt(torch.mean(torch.pow((prediction - tgt), 2), dim=0))
                 validationStep_loss.append(error.item())
 
             time_o = time.time()
@@ -250,6 +253,7 @@ class TransBath(BaseModel):
             dim_out=dim_out,
             kernel=kernel
            )
+        self.net.to(self.device)
         self.net.apply(weights_init)
 
         if resume:
@@ -266,7 +270,7 @@ class TransBath(BaseModel):
             self.net.train()
             self.optimizer = optim.Adam(self.net.parameters(), lr=self.config['Optimizer']['lr'], betas=(self.config['Optimizer']['beta'], 0.999))
 
-        self.net.to(self.device)
+
 
     def reinit_net(self):
         """
