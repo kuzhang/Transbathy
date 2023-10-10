@@ -23,7 +23,7 @@ class BathyDataset(Dataset):
         self.dataset_root = self.config['Data']['data_root']
         self.dataset = self.config['Data']['dataset']
         self.span = self.config['Data']['span']
-        self.data_interval, self.data_ids, self.shp_names, self.data_lons, self.data_lats, data_infos = self.load_raster_shp()
+        self.data_interval, self.data_ids, self.shp_list, self.data_lons, self.data_lats, data_infos = self.load_raster_shp()
 
         # random shuffle shape file
         total_len = self.data_interval[-1] + 1
@@ -50,8 +50,9 @@ class BathyDataset(Dataset):
         else:
             index_rec = index
 
-        shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
-        shp = pd.read_csv(shp_path)
+        #shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
+        #shp = pd.read_csv(shp_path)
+        shp = self.shp_list[shp_id]
         depth = shp['Depth'].iloc[index_rec]
         depth = torch.tensor([depth], dtype=torch.float32)
 
@@ -99,7 +100,7 @@ class BathyDataset(Dataset):
         data_len = 0
         data_interval = []
         data_ids = []
-        shp_names = []
+        shp_list = []
         data_lons = []
         data_lats = []
         data_infos = []
@@ -108,7 +109,11 @@ class BathyDataset(Dataset):
             with open(data_spec_path, "r") as fp:
                 dataset_spec = json.load(fp)
             shp_lens = dataset_spec['shp_infos']
-            shp_names.extend(dataset_spec['shp_names'])
+            #shp_names.extend(dataset_spec['shp_names'])
+            for name in dataset_spec['shp_names']:
+                shp_path = os.path.join(self.dataset_root, dataset, name)
+                shp = pd.read_csv(shp_path)
+                shp_list.append(shp)
             data_lons.append(dataset_spec['lons'])
             data_lats.append(dataset_spec['lats'])
             data_infos.append(dataset_spec)
@@ -117,7 +122,7 @@ class BathyDataset(Dataset):
                 data_interval.append(data_len - 1)
                 data_ids.append(idx)
 
-        return np.array(data_interval), data_ids, shp_names, data_lons, data_lats, data_infos
+        return np.array(data_interval), data_ids, shp_list, data_lons, data_lats, data_infos
 
     def clip_image(self, img_id, lon_idx, lat_idx):
         """

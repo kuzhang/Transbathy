@@ -48,7 +48,8 @@ class BaseModel():
         torch.manual_seed(seed_value)
         torch.cuda.manual_seed_all(seed_value)
         np.random.seed(seed_value)
-        #torch.backends.cudnn.deterministic = True
+        if not self.config['Device'] == 'cpu':
+            torch.backends.cudnn.deterministic = True
 
     ##
     def save_weights(self, epoch):

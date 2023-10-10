@@ -1,3 +1,4 @@
+import time
 
 from torch.utils.data import DataLoader
 import numpy as np
@@ -32,6 +33,9 @@ if __name__ == '__main__':
 
     # build dataloader
     dataloader = load_data(config)
+    #time_i = time.time()
     for data in dataloader['train']:
         print("data:{}".format(data))
+        #time_o = time.time()
+        #print('loading time:{}'.format(time_o - time_i))
         print('done')

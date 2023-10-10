@@ -18,8 +18,8 @@ def weights_init(mod):
 def position_encoding(
     seq_len: int,
     dim_model: int,
-    device: torch.device = torch.device("cpu"),
 ) -> Tensor:
+    device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
     pos = torch.arange(seq_len, dtype=torch.float, device=device).reshape(1, -1, 1)
     dim = torch.arange(dim_model, dtype=torch.float, device=device).reshape(1, 1, -1)
     phase = pos / (1e4 ** torch.div(dim, dim_model, rounding_mode="floor"))
