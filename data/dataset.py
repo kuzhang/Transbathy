@@ -166,6 +166,6 @@ if __name__ == '__main__':
         config = yaml.safe_load(file)
 
     data = BathyDataset(config)
-    sample = data.__getitem__(21111111)
+    sample = data.__getitem__(2)
 
     print('data loaded')
