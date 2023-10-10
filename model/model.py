@@ -21,12 +21,11 @@ class BaseModel():
         :param config: user defined model parameters, yaml file
         :param dataloader:
         """
-
+        self.config = config
         # Seed for deterministic behavior
         self.seed(config['Seed'])
 
         # Initalize variables.
-        self.config = config
         self.dataloader = dataloader
         self.trn_dir = os.path.join(self.config['Output_dir'], 'train')
         self.tst_dir = os.path.join(self.config['Output_dir'], 'test')
