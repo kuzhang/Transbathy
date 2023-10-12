@@ -9,7 +9,7 @@ import json
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Loading configurations in yaml file
-with open('../config/config-cpu.yaml', 'r') as file:
+with open('../config/config-gpu-test.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 

@@ -9,7 +9,7 @@ def plot_3dimg(x,y,z,idx):
     ax.scatter(x, y, z, marker='.')
     plt.show()
 
-root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\caborojo"
+root = r"C:\Users\ku500817\Downloads\2020_ngs_topobathy_guam_Job916868"
 
 for path, dirs, files in os.walk(root, topdown= False):
     for name in files:
@@ -28,8 +28,6 @@ for path, dirs, files in os.walk(root, topdown= False):
                 # reproject coordinate data from utm to lon and lats
                 rds = rds_downsampled.rio.reproject("EPSG:4326")
                 img = rds.to_numpy()
-
-                # replace nodata (-999999.) to np.nan
                 img[img==rds.rio.nodata] = np.nan
 
                 # calculate no-nan element in raster image
