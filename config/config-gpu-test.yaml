@@ -32,7 +32,7 @@ Optimizer:
 
 Test:
   load_weights: False
-  weight_dir: "./output/train/weights/net.pth"
+  weight_dir: "./output/train/weights/net_lidar_epcoh20_span2.pth"
   save_test: True
   save_file: "test_lidar_newarea.csv"
   visualize: False
