@@ -34,7 +34,7 @@ Optimizer:
 
 Test:
   load_weights: False
-  weight_dir: "./output/train/weights/net.pth"
+  weight_dir: "./outputs/train/weights/net.pth"
   save_test: True
   save_file: "test.csv"
 

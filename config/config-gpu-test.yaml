@@ -34,8 +34,8 @@ Optimizer:
    beta: 0.9 # momentum term of adam
 
 Test:
-  load_weights: False
-  weight_dir: "./output/train/weights/net_lidar_epcoh20_span2.pth"
+  load_weights: True
+  weight_dir: "./outputs/train/weights/net_lidar_epcoh20_span2.pth"
   save_test: True
   save_file: "test_lidar.csv"
   visualize: True

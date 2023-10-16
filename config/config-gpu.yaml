@@ -7,11 +7,6 @@ Metric: 'rmse'
 Data:
   data_root: "/home/maryam/Bathymetry_zhang/dataset/PR_lidar"
   dataset:
-    - 'caborojo'
-    - 'honolulu'
-    - 'keywest'
-    - 'makua'
-    - 'poleojea'
     - 'dalma_clip'
     - 'sirbaniyas_clip'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
@@ -20,7 +15,7 @@ Data:
   elev_threshold: -1
   split:
     - 0.7 # train split
-    - 0.2 # test split
+    - 0.3 # test split
   zscore_std: 2
 
 Train:
@@ -37,7 +32,7 @@ Optimizer:
 
 Test:
   load_weights: False
-  weight_dir: "./output/train/weights/net.pth"
+  weight_dir: "./outputs/train/weights/net.pth"
   save_test: True
   save_file: "test_lidarnclip.csv"
   visualize: False
