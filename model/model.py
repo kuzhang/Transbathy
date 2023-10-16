@@ -162,12 +162,12 @@ class BaseModel():
                 img = data['image'].to(self.device)
                 tgt = data['depth'].to(self.device)
                 prediction = self.net(img)
-                predictions.append(prediction)
                 if self.config['Test']['visualize']:
-                    observations.append(data['depth'])
-                    lons.append(data['lon'])
-                    lats.append(data['lat'])
+                    observations.extend(data['depth'].tolist())
+                    lons.extend(data['lon'].tolist())
+                    lats.extend(data['lat'].tolist())
                 error = torch.sqrt(torch.mean(torch.pow((prediction - tgt), 2), dim=0))
+                predictions.extend(prediction.to('cpu').tolist())
                 validationStep_loss.append(error.item())
 
             time_o = time.time()
@@ -191,8 +191,6 @@ class BaseModel():
                 if not os.path.isdir(dst):
                     os.makedirs(dst)
 
-                # current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S-test")
-                # str_current_datetime = str(current_datetime) + ".xlsx"
                 test_save_file = self.config['Test']['save_file']
                 results_file = os.path.join(dst, test_save_file)
 

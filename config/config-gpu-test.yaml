@@ -1,5 +1,5 @@
 # This config is for GPU training
-Phase: 'train' #'train' or 'test'
+Phase: 'test' #'train' or 'test'
 Seed: 1
 Device: 'gpu'
 Metric: 'rmse'
@@ -7,15 +7,18 @@ Metric: 'rmse'
 Data:
   data_root: "/home/maryam/Bathymetry_zhang/dataset/PR_lidar"
   dataset:
-    - 'guam'
-    - 'sanjuan'
+    - 'caborojo'
+    - 'honolulu'
+    - 'keywest'
+    - 'makua'
+    - 'poleojea'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
   workers: 4
   elev_threshold: -1
   split:
-    - 0 # train split
-    - 1 # test split
+    - 0.7 # train split
+    - 0.2 # test split
   zscore_std: 2
 
 Train:
@@ -34,9 +37,9 @@ Test:
   load_weights: False
   weight_dir: "./output/train/weights/net_lidar_epcoh20_span2.pth"
   save_test: True
-  save_file: "test_lidar_newarea.csv"
-  visualize: False
-  visual_save_file: "test_visual_newarea_output.csv"
+  save_file: "test_lidar.csv"
+  visualize: True
+  visual_save_file: "test_visual_output.csv"
 
 Model:
   tgt_len: 1
