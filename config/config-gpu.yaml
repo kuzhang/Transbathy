@@ -29,7 +29,7 @@ Train:
    start_epoch: 0
    num_epoch: 20
    print_freq: 1000
-   save_file: "train_lidarnclip.csv"
+   save_file: "train_rmse_lidarnclip.csv"
 
 Optimizer:
    lr: 0.001 # learning rate
@@ -39,9 +39,9 @@ Test:
   load_weights: False
   weight_dir: "./outputs/train/weights/net.pth"
   save_test: True
-  save_file: "test_lidarnclip.csv"
+  save_file: "test_rmse_lidarnclip.csv"
   visualize: False
-  visual_save_file: "test_visualize_output.csv"
+  visual_save_file: "test_outputs_lidarnclip.csv"
 
 Model:
   tgt_len: 1
