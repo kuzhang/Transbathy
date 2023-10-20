@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 from .dataset import BathyDataset
 import yaml
+from tqdm import tqdm
 
 def load_data(config):
     splits = ['train', 'test', 'val']
@@ -41,14 +42,17 @@ def load_data(config):
 
 if __name__ == '__main__':
     # Loading configurations in yaml file
-    with open('../config/config-cpu.yaml', 'r') as file:
+    with open('../config/config-cpu-test.yaml', 'r') as file:
         config = yaml.safe_load(file)
 
     # build dataloader
     dataloader = load_data(config)
-    #time_i = time.time()
-    for data in dataloader['train']:
-        print("data:{}".format(data))
-        #time_o = time.time()
-        #print('loading time:{}'.format(time_o - time_i))
-        print('done')
+    observations = []
+    lons = []
+    lats = []
+    for data in tqdm(dataloader['test'], leave=False, total=len(dataloader['test'])):
+        observations.extend(data['depth'].squeeze(-1).tolist())
+        lons.extend(data['lon'].tolist())
+        lats.extend(data['lat'].tolist())
+
+    print('done')

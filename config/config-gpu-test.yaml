@@ -5,7 +5,7 @@ Device: 'gpu'
 Metric: 'rmse'
 
 Data:
-  data_root: "/home/maryam/Bathymetry_zhang/dataset/PR_lidar"
+  data_root: "/home/maryam/Bathymetry_zhang/dataset/lidar"
   dataset:
     - 'sanjuan'
     - 'guam'

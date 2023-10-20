@@ -10,6 +10,7 @@ def plot_3dimg(x,y,z,idx):
     plt.show()
 
 root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\guam"
+scale_factor = 10
 
 for path, dirs, files in os.walk(root, topdown= False):
     for name in files:
@@ -17,7 +18,6 @@ for path, dirs, files in os.walk(root, topdown= False):
             img_path = os.path.join(path, name)
 
             with rxr.open_rasterio(img_path) as rds:
-                scale_factor = 10
                 new_width = rds.rio.width // scale_factor
                 new_height = rds.rio.height // scale_factor
                 rds_downsampled = rds.rio.reproject(

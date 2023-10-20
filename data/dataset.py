@@ -99,10 +99,10 @@ class BathyDataset(Dataset):
         """
         data_len = 0
         data_interval = []
-        data_ids = []
+        img_ids = []
         shp_list = []
-        data_lons = []
-        data_lats = []
+        img_lons = []
+        img_lats = []
         data_infos = []
         for idx, dataset in enumerate(self.dataset):
             data_spec_path = os.path.join(base_dir, '../dataset_spec', dataset +'.txt')
@@ -111,18 +111,18 @@ class BathyDataset(Dataset):
             shp_lens = dataset_spec['shp_infos']
             #shp_names.extend(dataset_spec['shp_names'])
             for name in dataset_spec['shp_names']:
-                shp_path = os.path.join(self.dataset_root, dataset, name)
+                shp_path = os.path.join(self.dataset_root, dataset, 'gt', name)
                 shp = pd.read_csv(shp_path)
                 shp_list.append(shp)
-            data_lons.append(dataset_spec['lons'])
-            data_lats.append(dataset_spec['lats'])
+            img_lons.append(dataset_spec['lons'])
+            img_lats.append(dataset_spec['lats'])
             data_infos.append(dataset_spec)
             for l in shp_lens:
                 data_len += l
                 data_interval.append(data_len - 1)
-                data_ids.append(idx)
+                img_ids.append(idx)
 
-        return np.array(data_interval), data_ids, shp_list, data_lons, data_lats, data_infos
+        return np.array(data_interval), img_ids, shp_list, img_lons, img_lats, data_infos
 
     def clip_image(self, img_id, lon_idx, lat_idx):
         """

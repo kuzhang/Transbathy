@@ -163,11 +163,11 @@ class BaseModel():
                 tgt = data['depth'].to(self.device)
                 prediction = self.net(img)
                 if self.config['Test']['visualize']:
-                    observations.extend(data['depth'].squeeze().tolist())
+                    observations.extend(data['depth'].squeeze(-1).tolist())
                     lons.extend(data['lon'].tolist())
                     lats.extend(data['lat'].tolist())
                 error = torch.sqrt(torch.mean(torch.pow((prediction - tgt), 2), dim=0))
-                predictions.extend(prediction.to('cpu').squeeze().tolist())
+                predictions.extend(prediction.to('cpu').squeeze(-1).tolist())
                 validationStep_loss.append(error.item())
 
             time_o = time.time()

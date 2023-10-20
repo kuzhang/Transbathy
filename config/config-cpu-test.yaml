@@ -1,22 +1,20 @@
 # This config is for GPU training
-Phase: 'train' #'train' or 'test'
+Phase: 'test' #'train' or 'test'
 Seed: 1
-Device: 'gpu'
+Device: 'cpu'
 Metric: 'rmse'
 
 Data:
-  data_root: '/home/kunet.ae/ku500817/dataset/clip'
-  #data_root: '/home/kunet.ae/ku500817/dataset/lidar'
+  data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
-    - 'dalma_clip'
-    - 'sirbaniyas_clip'
+    - 'guam'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
-  batch_size: 4
-  workers: 1
+  batch_size: 16
+  workers: 4
   elev_threshold: -1
   split:
-    - 0.7 # train split
-    - 0.3 # test split
+    - 0 # train split
+    - 1 # test split
   zscore_std: 2
 
 Train:
@@ -25,19 +23,19 @@ Train:
    start_epoch: 0
    num_epoch: 20
    print_freq: 1000
-   save_file: "train_clip.csv"
+   save_file: "train_lidarnclip.csv"
 
 Optimizer:
    lr: 0.001 # learning rate
    beta: 0.9 # momentum term of adam
 
 Test:
-  load_weights: False
-  weight_dir: "./outputs/train/weights/net.pth"
+  load_weights: True
+  weight_dir: "./outputs/train/weights/net_lidar_epoch20_span2.pth"
   save_test: True
-  save_file: "test_clip.csv"
-  visualize: False
-  visual_save_file: "test_visualize_output.csv"
+  save_file: "test_lidar.csv"
+  visualize: True
+  visual_save_file: "test_visual_newarea_output.csv"
 
 Model:
   tgt_len: 1
