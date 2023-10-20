@@ -1,0 +1,51 @@
+# This config is for GPU training
+Phase: 'train' #'train' or 'test'
+Seed: 1
+Device: 'gpu'
+Metric: 'rmse'
+
+Data:
+  data_root: "/home/xi/Bathymetry_zhang/dataset/lidar"
+  dataset:
+    - 'dalma_clip'
+    - 'sirbaniyas_clip'
+  span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
+  batch_size: 16
+  workers: 4
+  elev_threshold: -1
+  split:
+    - 0.7 # train split
+    - 0.3 # test split
+  zscore_std: 2
+
+Train:
+   resume: False
+   pre_trained_weights: 'weights/net.pth'
+   start_epoch: 0
+   num_epoch: 20
+   print_freq: 1000
+   save_file: "train_rmse_clip.csv"
+
+Optimizer:
+   lr: 0.001 # learning rate
+   beta: 0.9 # momentum term of adam
+
+Test:
+  load_weights: False
+  weight_dir: "./outputs/train/weights/net.pth"
+  save_test: True
+  save_file: "test_rmse_clip.csv"
+  visualize: False
+  visual_save_file: "test_outputs_clip.csv"
+
+Model:
+  tgt_len: 1
+  num_features: 3 # equal to dim_model in transformer
+  num_encoder_layers: 1
+  num_decoder_layers: 0
+  num_heads: 6
+  dim_feedforward: 12 # equal to dim_feedforward in transformer
+  dim_out: 1 # output dimension
+
+Output_dir: "./outputs"
+
