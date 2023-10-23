@@ -104,6 +104,8 @@ class BathyDataset(Dataset):
         img_lons = []
         img_lats = []
         data_infos = []
+        max_depth = 0
+        min_depth = -999
         for idx, dataset in enumerate(self.dataset):
             data_spec_path = os.path.join(base_dir, '../dataset_spec', dataset +'.txt')
             with open(data_spec_path, "r") as fp:
@@ -113,6 +115,10 @@ class BathyDataset(Dataset):
             for name in dataset_spec['shp_names']:
                 shp_path = os.path.join(self.dataset_root, dataset, 'gt', name)
                 shp = pd.read_csv(shp_path)
+                if shp['Depth'].min() < max_depth:
+                    max_depth = shp['Depth'].min()
+                if shp['Depth'].max() > min_depth:
+                    min_depth = shp['Depth'].max()
                 shp_list.append(shp)
             img_lons.append(dataset_spec['lons'])
             img_lats.append(dataset_spec['lats'])
@@ -121,6 +127,8 @@ class BathyDataset(Dataset):
                 data_len += l
                 data_interval.append(data_len - 1)
                 img_ids.append(idx)
+
+        print('datastet depth range from {}m to {}m \n'.format(max_depth, min_depth))
 
         return np.array(data_interval), img_ids, shp_list, img_lons, img_lats, data_infos
 

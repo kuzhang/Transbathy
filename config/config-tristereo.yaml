@@ -14,7 +14,7 @@ Data:
   span: 1 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 1
   workers: 0
-  elev_threshold: 0
+  elev_threshold: -0.1
   split:
     - 0.7 # train split
     - 0.3 # test split

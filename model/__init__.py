@@ -1,1 +1,1 @@
-from .model import BaseModel, TransBath
+from .model import BaseModel, TransBathy

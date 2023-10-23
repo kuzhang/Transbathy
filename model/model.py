@@ -223,13 +223,13 @@ class BaseModel():
 
             return results
 
-class TransBath(BaseModel):
+class TransBathy(BaseModel):
     """
-    TransBath Model
+    TransBathy Model
     """
 
     @property
-    def name(self): return 'TransBath'
+    def name(self): return 'TransBathy'
 
     def __init__(self, config, dataloader):
 

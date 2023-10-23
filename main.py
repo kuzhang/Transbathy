@@ -1,11 +1,11 @@
 import yaml
 from data import load_data
-from model import TransBath
+from model import TransBathy
 
 
 def run():
     # Loading configurations in yaml file
-    with open('config/config-gpu.yaml', 'r') as file:
+    with open('config/config-cpu.yaml', 'r') as file:
         config = yaml.safe_load(file)
     phase = config['Phase']
 
@@ -13,7 +13,7 @@ def run():
     dataloader = load_data(config)
 
     # build model
-    model = TransBath(config=config, dataloader=dataloader)
+    model = TransBathy(config=config, dataloader=dataloader)
 
     if phase == 'train':
         # start training

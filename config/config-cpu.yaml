@@ -5,13 +5,17 @@ Device: 'cpu'
 Metric: 'rmse'
 
 Data:
-  data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/PR_lidar'
+  data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
-    - 'guam'
+    - 'caborojo'
+    - 'keywest'
+    - 'honolulu'
+    - 'poleojea'
+    - 'makua'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 2
   workers: 0
-  elev_threshold: 0
+  elev_threshold: -0.1
   split:
     - 0 # train split
     - 1 # test split
