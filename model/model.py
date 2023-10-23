@@ -163,9 +163,9 @@ class BaseModel():
                 tgt = data['depth'].to(self.device)
                 prediction = self.net(img)
                 if self.config['Test']['visualize']:
-                    observations.extend(data['depth'].squeeze(-1).tolist())
                     lons.extend(data['lon'].tolist())
                     lats.extend(data['lat'].tolist())
+                observations.extend(data['depth'].squeeze(-1).tolist())
                 error = torch.sqrt(torch.mean(torch.pow((prediction - tgt), 2), dim=0))
                 predictions.extend(prediction.to('cpu').squeeze(-1).tolist())
                 validationStep_loss.append(error.item())
@@ -179,13 +179,20 @@ class BaseModel():
 
             print('Testing time: {:.2f} s, and the rmse: {} \n' .format(infer_time, rmse.item()))
 
+            # Calculate R-square
+            corr_matrix = np.corrcoef(observations, predictions)
+            corr = corr_matrix[0, 1]
+            R_sq = corr ** 2
+            print('Testing R square:{} \n'.format(R_sq.item()))
+
             results = {
                 'epoch': self.epoch,
                 'rmse': rmse.item(),
+                'r2': R_sq.item(),
                 'inference time': infer_time
             }
 
-            # Save test results
+            # Save test rmse results
             if self.config['Test']['save_test']:
                 dst = os.path.join(self.tst_dir, 'rmse')
                 if not os.path.isdir(dst):
@@ -200,6 +207,7 @@ class BaseModel():
                 else:
                     df.to_csv(results_file, mode='a', header=False, index=False)
 
+            # save the predictions vs the observation
             if self.config['Test']['visualize']:
                 visual_data ={
                     'lons': lons,
