@@ -10,7 +10,7 @@ rds = rioxarray.open_rasterio(r"C:\Users\ku500817\Desktop\bathymetry\dataset\Tra
 raster_lats = rds.y.to_numpy()
 raster_lons = rds.x.to_numpy()
 
-shp_path = r"C:\Users\ku500817\Desktop\bathymetry\dataset\TrainingData\clip\dalma_clip\dalma_clip.csv"
+shp_path = r"C:\Users\ku500817\Desktop\bathymetry\dataset\TrainingData\clip\alnouf\alnouf.csv"
 shp = pd.read_csv(shp_path)  # EPSG
 idx = random.randint(0, len(shp) - 1)
 i_idx = np.argmin(np.abs(raster_lats - shp['Latitude'].iloc[idx]))

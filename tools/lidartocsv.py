@@ -9,7 +9,7 @@ def plot_3dimg(x,y,z,idx):
     ax.scatter(x, y, z, marker='.')
     plt.show()
 
-root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\guam"
+root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\keywest"
 scale_factor = 10
 
 for path, dirs, files in os.walk(root, topdown= False):

@@ -5,8 +5,7 @@ Device: 'gpu'
 Metric: 'rmse'
 
 Data:
-  data_root: '/home/kunet.ae/ku500817/dataset/clip'
-  #data_root: '/home/kunet.ae/ku500817/dataset/lidar'
+  data_root: '/home/kunet.ae/ku500817/dataset/lidar'
   dataset:
     - 'dalma_clip'
     - 'sirbaniyas_clip'

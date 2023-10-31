@@ -50,8 +50,6 @@ class BathyDataset(Dataset):
         else:
             index_rec = index
 
-        #shp_path = os.path.join(self.dataset_root, self.dataset[img_id], 'gt', self.shp_names[shp_id])
-        #shp = pd.read_csv(shp_path)
         shp = self.shp_list[shp_id]
         depth = shp['Depth'].iloc[index_rec]
         depth = torch.tensor([depth], dtype=torch.float32)
@@ -141,9 +139,9 @@ class BathyDataset(Dataset):
         :return: ndarray
         """
         dataset = self.config['Data']['dataset'][img_id]
-        raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tif')
+        raster_path = os.path.join(self.dataset_root, dataset, dataset + '_color.tif')
         if not os.path.exists(raster_path):
-            raster_path = os.path.join(self.dataset_root, dataset, dataset + '.tiff')
+            raster_path = os.path.join(self.dataset_root, dataset, dataset + '_color.tiff')
 
         raster_img = rioxarray.open_rasterio(raster_path)
         width = raster_img.shape[2]

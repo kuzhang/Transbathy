@@ -5,19 +5,54 @@ import pandas as pd
 import os
 import rioxarray as rxr
 import json
+import matplotlib.pyplot as plt
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-
+NIR_thre = 500
 # Loading configurations in yaml file
 with open('../config/config-cpu-test.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 
+def remove_land_point_NIR(shp, nir_path):
+    """
+    remove land point from nir value
+    :param shp: Dataframe
+    :param nir_path: string
+    :return: Dataframe
+    """
+    rds = rxr.open_rasterio(nir_path)
+    rds = rds.rio.reproject("EPSG:4326")
+    raster_lats = rds.y.to_numpy()
+    raster_lons = rds.x.to_numpy()
+    img = rds.to_numpy().squeeze(0).astype(np.float32)
+    img[img == rds.rio.nodata] = np.nan
+    mask_arr = np.ma.masked_less(img, NIR_thre)
+    mask = mask_arr.mask
+
+    fig = plt.figure()
+    fig.add_subplot(1, 2, 1)
+    plt.imshow(img, cmap='gray', vmin=0, vmax=255)
+    fig.add_subplot(1, 2, 2)
+    plt.imshow(mask, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+
+    drop_list = []
+    for i, (x1, y1) in enumerate(zip(shp.Longitude.values, shp.Latitude.values)):
+        lon_idx = np.argmin(np.abs(raster_lons - x1))
+        lat_idx = np.argmin(np.abs(raster_lats - y1))
+        if not mask[lat_idx, lon_idx]:
+            drop_list.append(i)
+    shp = shp.drop(drop_list,axis='index')
+    shp.reset_index(inplace=True, drop=True)
+    return shp
+
+
 def remove_land_point(shp):
     """
     remove the in situ data where is for land
-    :param shp: dataframe
-    :return: dataframe
+    :param shp: Dataframe
+    :return: Dataframe
     """
     shp_dept = shp['Depth'].to_numpy()
     if np.median(shp_dept > 0):
@@ -57,6 +92,8 @@ for dataset in datasets:
             shp = pd.read_csv(shp_path)  # EPSG:4326-WGS 84
             shp_mod = remove_land_point(shp)
             shp_mod = remove_outlier(shp_mod)
+            #nir_path = os.path.join(data_path, dataset+'_nir.tiff')
+            #shp_mod = remove_land_point_NIR(shp_mod,nir_path)
             output_path = os.path.join(data_path, 'gt')
             if not os.path.exists(output_path):
                 os.mkdir(output_path)
@@ -66,7 +103,7 @@ for dataset in datasets:
             shp_infos.append(len(shp_mod))
             shp_names.append(name)
 
-        if (name.endswith('.tif') or name.endswith('.tiff')):
+        if (name.endswith('_color.tif') or name.endswith('_color.tiff')):
             raster_path = os.path.join(data_path, name)
             raster_img = rxr.open_rasterio(raster_path)
             raster_lats = raster_img.y.to_numpy()

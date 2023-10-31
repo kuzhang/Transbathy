@@ -8,17 +8,13 @@ Data:
   data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
     - 'caborojo'
-    - 'keywest'
-    - 'honolulu'
-    - 'poleojea'
-    - 'makua'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 2
   workers: 0
   elev_threshold: -0.1
   split:
-    - 0 # train split
-    - 1 # test split
+    - 0.01 # train split
+    - 0.01 # test split
   zscore_std: 2
 
 Train:
