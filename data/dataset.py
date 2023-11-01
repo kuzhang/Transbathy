@@ -122,7 +122,7 @@ class BathyDataset(Dataset):
                     remove_list = np.where(shp['Depth'] <= -41.0)[0].tolist()
                     shp = shp.drop(remove_list, axis='index')
                     shp.reset_index(inplace=True, drop=True)
-                
+
                 shp_list.append(shp)
             img_lons.append(dataset_spec['lons'])
             img_lats.append(dataset_spec['lats'])
