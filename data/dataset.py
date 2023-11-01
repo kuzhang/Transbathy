@@ -117,6 +117,12 @@ class BathyDataset(Dataset):
                     max_depth = shp['Depth'].min()
                 if shp['Depth'].max() > min_depth:
                     min_depth = shp['Depth'].max()
+
+                if config['Phase'] == 'test':
+                    remove_list = np.where(shp['Depth'] <= -41.0)[0].tolist()
+                    shp = shp.drop(remove_list, axis='index')
+                    shp.reset_index(inplace=True, drop=True)
+                
                 shp_list.append(shp)
             img_lons.append(dataset_spec['lons'])
             img_lats.append(dataset_spec['lats'])
