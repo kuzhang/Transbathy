@@ -31,7 +31,8 @@ class Transformer(nn.Module):
             dim_feedforward: int = 2048,
             dropout: float = 0.1,
             dim_out: int = 1,
-            kernel: int = 3
+            kernel: int = 3,
+            device=torch.device('cpu')
     ):
         super().__init__()
         self.encoder = TransformerEncoder(
@@ -40,6 +41,7 @@ class Transformer(nn.Module):
             num_heads=num_heads,
             dim_feedforward=dim_feedforward,
             dropout=dropout,
+            device=device
         )
         self.linear = linear(kernel, dim_out)
         self.pool = avgpool(dim_model)

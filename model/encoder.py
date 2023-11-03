@@ -1,3 +1,4 @@
+import torch
 from torch import Tensor, nn
 from .multiheadattention import MultiHeadAttention
 from .utils import position_encoding, feed_forward, Residual
@@ -35,6 +36,7 @@ class TransformerEncoder(nn.Module):
         num_heads: int = 6,
         dim_feedforward: int = 2048,
         dropout: float = 0.1,
+        device=torch.device('cpu')
     ):
         super().__init__()
         self.layers = nn.ModuleList(
@@ -44,9 +46,11 @@ class TransformerEncoder(nn.Module):
             ]
         )
 
+        self.device = device
+
     def forward(self, src: Tensor) -> Tensor:
         seq_len, dimension = src.size(1), src.size(2)
-        src += position_encoding(seq_len, dimension)
+        src += position_encoding(seq_len, dimension, self.device)
         for layer in self.layers:
             src = layer(src)
 

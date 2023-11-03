@@ -144,7 +144,7 @@ class BaseModel():
             # Load the weights of netg and netd.
             if self.config['Test']['load_weights']:
                 path = self.config['Test']['weight_dir']
-                pretrained_dict = torch.load(path)['state_dict']
+                pretrained_dict = torch.load(path, map_location=self.device)['state_dict']
 
                 try:
                     self.net.load_state_dict(pretrained_dict)
@@ -257,7 +257,8 @@ class TransBathy(BaseModel):
             num_heads= num_heads,
             dim_feedforward=dim_feedforward,
             dim_out=dim_out,
-            kernel=kernel
+            kernel=kernel,
+            device=self.device
            )
         self.net.to(self.device)
         self.net.apply(weights_init)

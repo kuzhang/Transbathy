@@ -60,7 +60,7 @@ class BathyDataset(Dataset):
         lat_idx = np.argmin(np.abs(lats - shp['Latitude'].iloc[index_rec]))
 
         img_clip = self.clip_image(img_id, lon_idx, lat_idx)
-        img_clip_norm = torch.from_numpy(img_clip / 255).to(torch.float32)
+        img_clip_norm = torch.from_numpy(img_clip / 10000.0).to(torch.float32)
 
         outputs = {
             'image': img_clip_norm,
@@ -118,7 +118,7 @@ class BathyDataset(Dataset):
                 if shp['Depth'].max() > min_depth:
                     min_depth = shp['Depth'].max()
 
-                if config['Phase'] == 'test':
+                if self.config['Phase'] == 'test':
                     remove_list = np.where(shp['Depth'] <= -41.0)[0].tolist()
                     shp = shp.drop(remove_list, axis='index')
                     shp.reset_index(inplace=True, drop=True)

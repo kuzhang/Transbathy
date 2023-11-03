@@ -7,10 +7,10 @@ Metric: 'rmse'
 Data:
   data_root: "/home/maryam/Bathymetry_zhang/dataset/lidar"
   dataset:
-    - 'guam'
+    - 'sanjuan'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
-  workers: 4
+  workers: 0
   elev_threshold: -0.1
   split:
     - 0 # train split
@@ -33,9 +33,9 @@ Test:
   load_weights: True
   weight_dir: "./outputs/train/weights/net_lidarnclip_epoch20_span2.pth"
   save_test: True
-  save_file: "test_rmse_guam_new.csv"
+  save_file: "test_rmse_sanjuan_new.csv"
   visualize: True
-  visual_save_file: "test_visual_output_guam_new.csv"
+  visual_save_file: "test_visual_output_sanjuan_new.csv"
 
 Model:
   tgt_len: 1
