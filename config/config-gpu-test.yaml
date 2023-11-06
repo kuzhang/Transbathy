@@ -10,7 +10,7 @@ Data:
     - 'sanjuan'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
-  workers: 0
+  workers: 4
   elev_threshold: -0.1
   split:
     - 0 # train split

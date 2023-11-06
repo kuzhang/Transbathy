@@ -46,5 +46,5 @@ Model:
   dim_feedforward: 12 # equal to dim_feedforward in transformer
   dim_out: 1 # output dimension
 
-Output_dir: "./outputs"
+Output_dir: "C:/Users/ku500817/Desktop/bathymetry/code/testonhost"
 
