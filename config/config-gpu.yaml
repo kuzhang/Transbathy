@@ -25,12 +25,12 @@ Data:
   zscore_std: 2
 
 Train:
-   resume: True
+   resume: False
    pre_trained_weights: "./outputs/train/weights/net.pth"
-   start_epoch: 12
+   start_epoch: 0
    num_epoch: 20
    print_freq: 1000
-   save_file: "train_rmse_lidarnclipnew.csv"
+   save_file: "train_rmse_lidarnabu_epcoh20_span2_nov6.csv"
 
 Optimizer:
    lr: 0.001 # learning rate
@@ -40,9 +40,9 @@ Test:
   load_weights: False
   weight_dir: "./outputs/train/weights/net.pth"
   save_test: True
-  save_file: "test_rmse_lidarnclipnew.csv"
+  save_file: "test_rmse_lidarnabu_epoch20_span2_nov6.csv"
   visualize: False
-  visual_save_file: "test_outputs_lidarnclipnew.csv"
+  visual_save_file: "test_outputs_lidarnabu_epoch20_span2_nov6.csv"
 
 Model:
   tgt_len: 1
