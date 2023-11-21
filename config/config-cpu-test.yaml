@@ -7,7 +7,14 @@ Metric: 'rmse'
 Data:
   data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
-    - 'sanjuan'
+    - 'dalma'
+    - 'sirbaniyas'
+    - 'caborojo'
+    - 'keywest'
+    - 'honolulu'
+    - 'poleojea'
+    - 'makua'
+    - 'taweelah'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
   workers: 0

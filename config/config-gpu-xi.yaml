@@ -1,5 +1,5 @@
 # This config is for GPU training
-Phase: 'train' #'train' or 'test'
+Phase: 'test' #'train' or 'test'
 Seed: 1
 Device: 'gpu'
 Metric: 'rmse'
@@ -7,8 +7,14 @@ Metric: 'rmse'
 Data:
   data_root: "/home/xi/Bathymetry_zhang/dataset/lidar"
   dataset:
-    - 'dalma_clip'
-    - 'sirbaniyas_clip'
+    - 'dalma'
+    - 'sirbaniyas'
+    - 'caborojo'
+    - 'keywest'
+    - 'honolulu'
+    - 'poleojea'
+    - 'makua'
+    - 'taweelah'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
   workers: 4
@@ -31,12 +37,12 @@ Optimizer:
    beta: 0.9 # momentum term of adam
 
 Test:
-  load_weights: False
-  weight_dir: "./outputs/train/weights/net.pth"
+  load_weights: True
+  weight_dir: "./outputs/train/weights/net_lidarnabu_epoch20_span2_nov6.pth"
   save_test: True
-  save_file: "test_rmse_clip.csv"
-  visualize: False
-  visual_save_file: "test_outputs_clip.csv"
+  save_file: "test_rmse_lidarnabu_nov6.csv"
+  visualize: True
+  visual_save_file: "test_outputs_lidarnabu_nov6.csv"
 
 Model:
   tgt_len: 1
