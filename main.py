@@ -5,7 +5,7 @@ from model import TransBathy
 
 def run():
     # Loading configurations in yaml file
-    with open('config/config-gpu-xi.yaml', 'r') as file:
+    with open('config/config-gpu.yaml', 'r') as file:
         config = yaml.safe_load(file)
     phase = config['Phase']
 

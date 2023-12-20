@@ -8,20 +8,13 @@ Data:
   data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
     - 'dalma'
-    - 'sirbaniyas'
-    - 'caborojo'
-    - 'keywest'
-    - 'honolulu'
-    - 'poleojea'
-    - 'makua'
-    - 'taweelah'
   span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
   workers: 0
   elev_threshold: -0.1
   split:
-    - 0 # train split
-    - 1 # test split
+    - 0.7 # train split
+    - 0.3 # test split
   zscore_std: 2
 
 Train:
@@ -40,9 +33,9 @@ Test:
   load_weights: True
   weight_dir: "C:/Users/ku500817/Desktop/bathymetry/code/TransBathy_results/net_lidarnclip_epoch20_span2.pth"
   save_test: True
-  save_file: "test_rmse_sanjuan.csv"
+  save_file: "test_rmse_global.csv"
   visualize: True
-  visual_save_file: "test_visual_output_sanjuan.csv"
+  visual_save_file: "test_visual_output_global.csv"
 
 Model:
   tgt_len: 1

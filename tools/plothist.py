@@ -31,6 +31,6 @@ for dataset in datasets:
             shp_data.extend(shp_dept)
 
 
-plt.hist(shp_data, bins=100)
+plt.hist(shp_data, bins=50)
 plt.xlabel('depth')
 plt.show()
