@@ -2,37 +2,53 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-shp_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\test_visual_output_sanjuan_nov6.csv"
-out_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\sanjuan_bias_nov6.xlsx"
+shp_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\global\test_outputs_lidarnabu_epoch20_span2_nov21.csv"
+out_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\global\\global_bias_statics.xlsx"
 
 shp = pd.read_csv(shp_path)
 shp_prd = shp['predictions'].to_numpy()
 shp_depth = shp['observation'].to_numpy()
 shp_diff = abs(shp_depth - shp_prd)
+shp_diff_ratio = abs(shp_diff/shp_depth)
 
 max_depth = np.min(shp_depth)
 n_loops = abs(max_depth) // 5 + 1
+bounds= [0,-1,-2,-3,-4,-5,-10,-15,-20,-25,-30,-35,-40,-45,-50]
 
 count = []
 x = []
 y = []
 e = []
-upbound = -5
-for i in range(int(n_loops)):
-    upbound = i * -5
-    lowbound = (i + 1) * -5
-    if i == 0:
-        arr = shp_diff[np.where(shp_depth >= lowbound)]
-    elif i == n_loops - 1:
-        arr = shp_diff[np.where(shp_depth < upbound)]
-    else:
-        arr = shp_diff[np.where(np.logical_and(shp_depth >= lowbound, shp_depth < upbound))]
+r = []
+for i in range(len(bounds)-1):
+    upbound = bounds[i]
+    lowbound = bounds[i+1]
+    indexes = np.where(np.logical_and(shp_depth >= lowbound, shp_depth < upbound))
+    arr = shp_diff[indexes]
+    arr_ratio = shp_diff_ratio[indexes]
 
     if not arr.size == 0:
         count.append(arr)
         x.append(lowbound)
         y.append(np.mean(arr))
         e.append(np.std(arr))
+        r.append(np.mean(arr_ratio))
+
+# for i in range(int(n_loops)):
+#     upbound = i * -5
+#     lowbound = (i + 1) * -5
+#     if i == 0:
+#         arr = shp_diff[np.where(shp_depth >= lowbound)]
+#     elif i == n_loops - 1:
+#         arr = shp_diff[np.where(shp_depth < upbound)]
+#     else:
+#         arr = shp_diff[np.where(np.logical_and(shp_depth >= lowbound, shp_depth < upbound))]
+#
+#     if not arr.size == 0:
+#         count.append(arr)
+#         x.append(lowbound)
+#         y.append(np.mean(arr))
+#         e.append(np.std(arr))
 
 
 print(x)
@@ -40,8 +56,9 @@ print(y)
 print(e)
 dict = {}
 dict['depth'] = x
-dict['mean'] = y
-dict['error'] = e
+dict['error_av'] = y
+dict['error_std'] = e
+dict['error_ratio_mean'] = r
 df = pd.DataFrame(dict)
 df.to_excel(out_path)
 # plt.errorbar(x, y, e, linestyle='None', marker='^')

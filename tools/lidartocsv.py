@@ -9,7 +9,7 @@ def plot_3dimg(x,y,z,idx):
     ax.scatter(x, y, z, marker='.')
     plt.show()
 
-root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\keywest"
+root = r"C:\Users\ku500817\Desktop\bathymetry\dataset\collected data\Lidar data\NOAA\sanjuan\merge"
 scale_factor = 10
 
 for path, dirs, files in os.walk(root, topdown= False):
@@ -61,6 +61,6 @@ for path, dirs, files in os.walk(root, topdown= False):
                 if not os.path.exists(output_path):
                     os.mkdir(output_path)
                 csv_file = os.path.join(output_path,output_name)
-                df.to_csv(csv_file)
+                df.to_csv(csv_file, index=False)
 
 print('Done')

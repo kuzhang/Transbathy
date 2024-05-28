@@ -2,10 +2,10 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
 
-fig = plt.figure(figsize=(10,8))
+fig = plt.figure(figsize=(8,5))
 
-m = Basemap(projection='mill',
-           llcrnrlat = -0,
+m = Basemap(projection='cyl',
+           llcrnrlat = -90,
            urcrnrlat = 90,
            llcrnrlon = -180,
            urcrnrlon = 180,

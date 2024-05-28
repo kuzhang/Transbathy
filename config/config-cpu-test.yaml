@@ -7,14 +7,14 @@ Metric: 'rmse'
 Data:
   data_root: 'C:/Users/ku500817/Desktop/bathymetry/dataset/TrainingData/lidar'
   dataset:
-    - 'dalma'
-  span: 2 # diameter of the area surrounding the selected pixel point, for the data sampling
+    - 'sanjuan'
+  span: 3 # diameter of the area surrounding the selected pixel point, for the data sampling
   batch_size: 16
   workers: 0
   elev_threshold: -0.1
   split:
-    - 0.7 # train split
-    - 0.3 # test split
+    - 0 # train split
+    - 1 # test split
   zscore_std: 2
 
 Train:
@@ -31,11 +31,11 @@ Optimizer:
 
 Test:
   load_weights: True
-  weight_dir: "C:/Users/ku500817/Desktop/bathymetry/code/TransBathy_results/net_lidarnclip_epoch20_span2.pth"
+  weight_dir: "C:/Users/ku500817/Desktop/SPAN/net_lidarnabu_span3_epoch20_de21.pth"
   save_test: True
-  save_file: "test_rmse_global.csv"
+  save_file: "test_rmse_sanjuan_span3_dec26.csv"
   visualize: True
-  visual_save_file: "test_visual_output_global.csv"
+  visual_save_file: "test_visual_output_sanjuan_span3_dec26.csv"
 
 Model:
   tgt_len: 1

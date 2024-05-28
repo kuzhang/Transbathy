@@ -1,0 +1,8 @@
+# This config is for dataprocess testing
+
+Data:
+  data_root: "C:/Users/ku500817/Desktop/bathymetry/dataset/collected data/Lidar data/SHOM/france_site1"
+  dataset:
+    - 'csv'
+  elev_threshold: -0.1
+  zscore_std: 2
