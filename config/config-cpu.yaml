@@ -37,6 +37,12 @@ Test:
   visualize: False
   visual_save_file: "test_visualize_output.csv"
 
+Validation:
+  save_val: True
+  save_file: "validation.csv"
+  visualize: False
+  visual_save_file: "validation_visualize_output.csv"
+
 Model:
   tgt_len: 1
   num_features: 3 # equal to dim_model in transformer

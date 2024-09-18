@@ -29,8 +29,8 @@ class BaseModel():
         self.dataloader = dataloader
         self.trn_dir = os.path.join(self.config['Output_dir'], 'train')
         self.tst_dir = os.path.join(self.config['Output_dir'], 'test')
+        self.val_dir = os.path.join(self.config['Outpur_dir'], 'val')
         self.device = torch.device("cuda:0" if self.config['Device'] != 'cpu' else "cpu")
-
 
     def seed(self, seed_value):
         """ Seed
@@ -127,7 +127,7 @@ class BaseModel():
         for self.epoch in range(self.config['Train']['start_epoch'], self.config['Train']['num_epoch']):
             # Train for one epoch
             self.train_one_epoch()
-            res = self.test()
+            res = self.val()
             if res[self.config['Metric']] <= best_rmse:
                 best_rmse = res[self.config['Metric']]
                 self.save_weights(self.epoch)
@@ -172,7 +172,7 @@ class BaseModel():
 
             time_o = time.time()
             rmse = np.array(validationStep_loss).mean()
-            self.validationEpoch_loss.append(rmse)
+            self.testEpoch_loss.append(rmse)
 
             # Measure inference time.
             infer_time = time_o - time_i
@@ -218,6 +218,86 @@ class BaseModel():
 
                 df = pd.DataFrame(visual_data)
                 visual_save_file = self.config['Test']['visual_save_file']
+                visual_file = os.path.join(dst, visual_save_file)
+                df.to_csv(visual_file, index=False, header=True)
+
+            return results
+
+    def val(self):
+        """ Validate model
+        """
+        print(">> validating model %s." % self.name)
+        self.net.eval()
+
+        with torch.no_grad():
+            # Load the weights of netg and netd.
+
+            predictions = []
+            observations = []
+            lons = []
+            lats = []
+            validationStep_loss = []
+            time_i = time.time()
+            for data in tqdm(self.dataloader['val'], leave=False, total=len(self.dataloader['val'])):
+                img = data['image'].to(self.device)
+                tgt = data['depth'].to(self.device)
+                prediction = self.net(img)
+                if self.config['Test']['visualize']:
+                    lons.extend(data['lon'].tolist())
+                    lats.extend(data['lat'].tolist())
+                observations.extend(data['depth'].squeeze(-1).tolist())
+                error = torch.sqrt(torch.mean(torch.pow((prediction - tgt), 2), dim=0))
+                predictions.extend(prediction.to('cpu').squeeze(-1).tolist())
+                validationStep_loss.append(error.item())
+
+            time_o = time.time()
+            rmse = np.array(validationStep_loss).mean()
+            self.validationEpoch_loss.append(rmse)
+
+            # Measure inference time.
+            infer_time = time_o - time_i
+
+            print('inference time: {:.2f} s, and the rmse: {} \n' .format(infer_time, rmse.item()))
+
+            # Calculate R-square
+            corr_matrix = np.corrcoef(observations, predictions)
+            corr = corr_matrix[0, 1]
+            R_sq = corr ** 2
+            print('validation R square:{} \n'.format(R_sq.item()))
+
+            results = {
+                'epoch': self.epoch,
+                'rmse': rmse.item(),
+                'r2': R_sq.item(),
+                'inference time': infer_time
+            }
+
+            # Save test rmse results
+            if self.config['Validation']['save_val']:
+                dst = os.path.join(self.val_dir, 'rmse')
+                if not os.path.isdir(dst):
+                    os.makedirs(dst)
+
+                test_save_file = self.config['Validation']['save_file']
+                results_file = os.path.join(dst, test_save_file)
+
+                df = pd.DataFrame([results])
+                if not os.path.exists(results_file):
+                    df.to_csv(results_file, index=False, header=True)
+                else:
+                    df.to_csv(results_file, mode='a', header=False, index=False)
+
+            # save the predictions vs the observation
+            if self.config['Validation']['visualize']:
+                visual_data ={
+                    'lons': lons,
+                    'lats': lats,
+                    'predictions': predictions,
+                    'observation': observations
+                }
+
+                df = pd.DataFrame(visual_data)
+                visual_save_file = self.config['Validation']['visual_save_file']
                 visual_file = os.path.join(dst, visual_save_file)
                 df.to_csv(visual_file, index=False, header=True)
 
