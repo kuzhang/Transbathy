@@ -1,2 +1,2 @@
 # Transbathy
- banthymetry using transformer
+ Coastal banthymetic mapping using self-attention

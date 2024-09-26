@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-shp_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\global\test_outputs_lidarnabu_epoch20_span2_nov21.csv"
-out_path = r"C:\Users\ku500817\Desktop\bathymetry\code\TransBathy_results\trainingcurvers\global\\global_bias_statics.xlsx"
+shp_path = r"C:\Users\ku500817\Desktop\research\bathymetry\code\TransBathy_results\global\test_visual_output_global_240919.csv"
+out_path = r"C:\Users\ku500817\Desktop\research\bathymetry\code\TransBathy_results\trainingcurvers\global\global_bias_statics_240919.xlsx"
 
 shp = pd.read_csv(shp_path)
 shp_prd = shp['predictions'].to_numpy()
