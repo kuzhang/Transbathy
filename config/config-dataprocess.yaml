@@ -1,0 +1,19 @@
+# This config is for dataprocess testing
+
+Data:
+  data_root: '/home/maryam/Bathymetry_zhang/dataset/lidar'
+  dataset:
+    - 'dalma'
+    - 'sirbaniyas'
+    - 'caborojo'
+    - 'keywest'
+    - 'honolulu'
+    - 'poleojea'
+    - 'makua'
+    - 'taweelah'
+    - 'guam'
+    - 'sanjuan'
+    - 'abudhabi'
+    - 'alnouf'
+  elev_threshold: -0.1
+  zscore_std: 2
